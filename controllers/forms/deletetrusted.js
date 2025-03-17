@@ -17,14 +17,13 @@ module.exports = {
 		
 		const errors = await checkSchema([
 			{ result: lengthBody(req.body.checkedtrusted, 1), expected: false, error: __('Must select at least one user to delete') },
-			{ result: existsBody(req.body.checkedtrusted) && req.body.checkedtrusted.some(s => !res.locals.board.trusted[s]), expected: false, error: __('Invalid user selection') },
 		]);
 
 		if (errors.length > 0) {
 			return dynamicResponse(req, res, 400, 'message', {
 				'title': __('Bad request'),
 				'errors': errors,
-				'redirect': req.headers.referer || `/${req.params.board}/manage/trusted.html`,
+				'redirect': req.headers.referer || '/globalmanage/trusted.html',
 			});
 		}
 		

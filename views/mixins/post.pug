@@ -35,16 +35,13 @@ mixin post(post, truncate, manage=false, globalmanage=false, ban=false, overboar
 						|  
 						- const ip = viewRawIp === true ? post.ip.raw : post.ip.cloak;
 						if approval
-							a.bold(href=`recent.html?ip=${encodeURIComponent(ip)}`) [#{ip}]
+							a.bold(href=`?ip=${encodeURIComponent(ip)}`) [#{ip}]
 						else 
 							a.bold(href=`?ip=${encodeURIComponent(ip)}`) [#{ip}]
 					|
 					|
-					if (modview || manage || globalmanage) && post.account
-						if viewRawAccount
-							a.bold(href=`/globalmanage/recent.html?account=${encodeURIComponent(post.account)}`) #{post.account}
-						else
-							span.post-username Account Holder
+					if (modview || manage || globalmanage) && post.nohide && post.account
+						a.bold(href=`${upLevel ? '../' : ''}recent.html?account=${encodeURIComponent(post.account)}`) #{post.account}
 					|
 					|
 					if !post.thread
