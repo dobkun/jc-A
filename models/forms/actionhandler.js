@@ -204,29 +204,43 @@ module.exports = async (req, res, next) => {
 		}
 
 	} else if (req.body.move) {
-
-		if (boardThreadMap[req.params.board].directThreads.size > 0) {
-			const threadIds = [...boardThreadMap[req.params.board].directThreads];
-			const fetchMovePosts = await Posts.db.find({
-				'board': req.params.board,
-				'thread': {
-					'$in': threadIds
+		switch (boardThreadMap[req.params.board].directThreads.size) {
+			case 0:
+				return dynamicResponse(req, res, 403, 'message', {
+					'title': __(''),
+					'error': __('You may only move a thread.'),
+					redirect,
+				});
+			case 1: {
+				const threadId = [...boardThreadMap[req.params.board].directThreads][0];
+				const fetchMoveReplies = await Posts.db.find({
+					'board': req.params.board,
+					'thread': {
+						'$eq': threadId
+					}
+				}).toArray();
+				res.locals.posts = res.locals.posts.concat(fetchMoveReplies);
+				const { message, action } = await movePosts(req, res);
+				if (action) {
+					modlogActions.push(ModlogActions.MOVE);
+					recalculateThreadMetadata = true;
+					if (res.locals.destinationBoard && res.locals.destinationThread) {
+						res.locals.posts.push(res.locals.destinationThread);
+						({ boardThreadMap, numPagesBeforeActions, affectedBoardNames } = await getAffectedBoards(res.locals.posts, deleting));
+						minimalThreadsMap = await Posts.getMinimalThreads(affectedBoardNames);
+					}
 				}
-			}).toArray();
-			res.locals.posts = res.locals.posts.concat(fetchMovePosts);
-		}
-		const { message, action } = await movePosts(req, res);
-		if (action) {
-			modlogActions.push(ModlogActions.MOVE);
-			recalculateThreadMetadata = true;
-			if (res.locals.destinationBoard && res.locals.destinationThread) {
-				res.locals.posts.push(res.locals.destinationThread);
-				({ boardThreadMap, numPagesBeforeActions, affectedBoardNames } = await getAffectedBoards(res.locals.posts, deleting));
-				minimalThreadsMap = await Posts.getMinimalThreads(affectedBoardNames);
+				messages.push(message);
+				redirect = `/${res.locals.destinationBoard._id}/manage/thread/${res.locals.destinationThread.postId}.html`;
+				break;
 			}
-		}
-		messages.push(message);
-
+			default:
+				return dynamicResponse(req, res, 403, 'message', {
+					'title': __(''),
+					'error': __('You may only move one thread.'),
+					redirect,
+				});
+		}	
 	} else {
 
 		// if it was getting deleted/moved, dont do these actions
@@ -361,12 +375,16 @@ module.exports = async (req, res, next) => {
 					}
 				};
 			}
-			modlog[post.board].postLinks.push({
-				postId: post.postId,
-				thread: res.locals.destinationThread ? res.locals.destinationThread.postId : post.thread,
-				board: res.locals.destinationBoard ? res.locals.destinationBoard._id : post.board,
-			});
-		}
+			
+			if ((req.body.move && !post.thread) || (!req.body.move)) {
+				modlog[post.board].postLinks.push({
+					postId: req.body.move ? res.locals.destinationThread.postId : post.postId,
+					thread: res.locals.destinationThread ? res.locals.destinationThread.postId : post.thread,
+					board: res.locals.destinationBoard ? res.locals.destinationBoard._id : post.board,
+				});						
+			}				
+		}		
+		
 		const modlogDocuments = [];
 		for (let i = 0; i < affectedBoardNames.length; i++) {
 			const boardName = affectedBoardNames[i];
@@ -516,17 +534,6 @@ module.exports = async (req, res, next) => {
 			//get the board data for build tasks, and highest/lowest affected pages for rebuilding
 			const boardName = affectedBoardNames[i];
 			const board = buildBoards[boardName];
-
-			//rebuild destination thread for "move" action
-			if (req.body.move) {
-				buildQueue.push({
-					'task': 'buildThread',
-					'options': {
-						'threadId': req.body.move_to_thread,
-						'board': board,
-					}
-				});
-			}
 
 			//rebuild affected threads
 			for (let j = 0; j < boardThreadMap[boardName].threads.length; j++) {
