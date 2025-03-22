@@ -46,8 +46,8 @@ module.exports = {
 			{ result: lengthBody(req.body.ban_reason, 0, globalLimits.fieldLength.ban_reason), expected: false, error: __('Ban reason must be %s characters or less', globalLimits.fieldLength.ban_reason) },
 			{ result: lengthBody(req.body.log_message, 0, globalLimits.fieldLength.log_message), expected: false, error: __('Modlog message must be %s characters or less', globalLimits.fieldLength.log_message) },
 			{ result: (existsBody(req.body.report || req.body.global_report) && lengthBody(req.body.report_reason, 1)), expected: false, blocking: true, error: __('Reports must have a reason') },
-			{ result: (existsBody(req.body.move) && (!req.body.move_to_board)), expected: false, error: __('Must input destinaton board to move thread') },
-			{ result: (existsBody(req.body.move) && req.body.checkedposts.length === 1), expected: true, error: __('Must select a single post to move') },
+			{ result: (existsBody(req.body.move) && (!req.body.move_to_board)), expected: false, error: __('Must input destination board to move thread') },
+			{ result: existsBody(req.body.move) && req.body.checkedposts.length > 1, expected: false, error: __('Must select a single thread to move') },
 			{ result: async () => {
 				if (req.body.move && req.body.move_to_board
 					&& req.body.move_to_board !== req.params.board) {
