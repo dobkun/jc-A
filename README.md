@@ -14,7 +14,6 @@ Contact the author:
 ## Features
  - [x] Media approval
  - [x] Trust system
- - [x] Optional user created boards
  - [x] Multiple files per post
  - [x] Antispam/Anti-flood & DNSBL
  - [x] 3 customisable inbuilt captchas + 3 third party captchas (hcaptcha, recaptcha, yandex smartcaptcha)
