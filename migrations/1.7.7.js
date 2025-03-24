@@ -113,6 +113,206 @@ module.exports = async(db, redis) => {
 		fs.ensureDir(`${uploadDirectory}/flag`),
 	]);
 	
+	console.log('Update flags in posts');
+	let bulkWrite = [
+		{
+			updateMany: {
+				filter: { 'country.name': '911' },
+				update: {
+					$set: {
+						country: {
+							name: '911',
+							code: '911',
+							src: '911.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'hyena' },
+				update: {
+					$set: {
+						country: {
+							name: 'hyena',
+							code: 'hyena',
+							src: 'hyena.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'katia' },
+				update: {
+					$set: {
+						country: {
+							name: 'katia',
+							code: 'katia',
+							src: 'katia.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'averi' },
+				update: {
+					$set: {
+						country: {
+							name: 'averi',
+							code: 'averi',
+							src: 'averi.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'blackchan' },
+				update: {
+					$set: {
+						country: {
+							name: 'blackchan',
+							code: 'blackchan',
+							src: 'blackchan.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'oogami-san' },
+				update: {
+					$set: {
+						country: {
+							name: 'oogami-san',
+							code: 'oogami-san',
+							src: 'oogami-san.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'bully' },
+				update: {
+					$set: {
+						country: {
+							name: 'bully',
+							code: 'bully',
+							src: 'bully.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'shami' },
+				update: {
+					$set: {
+						country: {
+							name: 'shami',
+							code: 'shami',
+							src: 'shami.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'aros' },
+				update: {
+					$set: {
+						country: {
+							name: 'aros',
+							code: 'aros',
+							src: 'aros.gif',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'patty' },
+				update: {
+					$set: {
+						country: {
+							name: 'patty',
+							code: 'patty',
+							src: 'patty.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'missy' },
+				update: {
+					$set: {
+						country: {
+							name: 'missy',
+							code: 'missy',
+							src: 'missy.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'anon' },
+				update: {
+					$set: {
+						country: {
+							name: 'anon',
+							code: 'anon',
+							src: 'anon.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+		{
+			updateMany: {
+				filter: { 'country.name': 'pepe' },
+				update: {
+					$set: {
+						country: {
+							name: 'pepe',
+							code: 'pepe',
+							src: 'pepe.png',
+							custom: true,
+						}
+					}
+				}
+			},
+		},
+	];
+	await db.collection('posts').bulkWrite(bulkWrite);
+	
 	console.log('Clearing all cache');
 	await redis.deletePattern('*');
 };
