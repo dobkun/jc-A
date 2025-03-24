@@ -44,8 +44,8 @@ module.exports = async (req, res, next) => {
 		Handle checking passwords (in a time-constant) when doing actions that require a password.
 		Staff skip this section because they don't need passwords to do such actions.
 	*/
-	const isStaffOrGlobal = res.locals.permissions.hasAny(Permissions.MANAGE_GLOBAL_GENERAL, Permissions.MANAGE_BOARD_GENERAL);
-	if (!isStaffOrGlobal && res.locals.actions.numPasswords > 0) {
+	const isMod = res.locals.permissions.get(Permissions.MANAGE_GENERAL);
+	if (!isMod && res.locals.actions.numPasswords > 0) {
 		let passwordPosts = [];
 		if (req.body.postpassword && req.body.postpassword.length > 0) {
 			const inputPasswordHash = createHash('sha256').update(postPasswordSecret + req.body.postpassword).digest('base64');
@@ -72,15 +72,6 @@ module.exports = async (req, res, next) => {
 	const modlogActions = [];
 	const combinedQuery = {};
 	let recalculateThreadMetadata = false;
-
-	// handle approvals first, may lead to ban and/or deletions later
-	if (req.body.approve) {
-		const { message, log_message } = await moderateFiles(req, res);
-
-		req.body.log_message = log_message;
-		modlogActions.push(message);
-		messages.push(message);
-	}
 
 	const deleting = req.body.delete || req.body.delete_ip_board || req.body.delete_ip_global || req.body.delete_ip_thread;
 
@@ -128,7 +119,7 @@ module.exports = async (req, res, next) => {
 	if (deleting) {
 
 		//OP delete protection. for old OPs or with a lot of replies
-		if (!isStaffOrGlobal) { //TODO: make this use a permission bit
+		if (!isMod) { //TODO: make this use a permission bit
 			const { deleteProtectionAge, deleteProtectionCount } = res.locals.board.settings;
 			if (deleteProtectionAge > 0 || deleteProtectionCount > 0) {
 				const protectedThread = res.locals.posts.some(p => {
@@ -242,16 +233,24 @@ module.exports = async (req, res, next) => {
 				});
 		}	
 	} else {
+		// handle approvals first, may lead to file deletion
+		if (req.body.approve || req.body.deny) {
+			const { log_message, message } = await moderateFiles(req, res);
+
+			if (req.body.log_message) {
+				req.body.log_message = req.body.log_message.concat(log_message);
+			} else {
+				req.body.log_message = log_message;
+			}
+			modlogActions.push(ModlogActions.MODERATE_FILES);
+			messages.push(message);
+		}
 
 		// if it was getting deleted/moved, dont do these actions
-		if (req.body.unlink_file || req.body.delete_file) {
-			const { message, action, query } = await deletePostsFiles(res.locals, req.body.unlink_file);
+		if (req.body.delete_file) {
+			const { message, action, query } = await deletePostsFiles(res.locals);
 			if (action) {
-				if (req.body.unlink_file) {
-					modlogActions.push(ModlogActions.UNLINK_FILES);
-				} else if (req.body.delete_file) {
-					modlogActions.push(ModlogActions.DELETE_FILES);
-				}
+				modlogActions.push(ModlogActions.DELETE_FILES);
 				recalculateThreadMetadata = true;
 				combinedQuery[action] = { ...combinedQuery[action], ...query};
 			}
@@ -353,7 +352,7 @@ module.exports = async (req, res, next) => {
 		const message = req.body.log_message || null;
 		let logUser = null;
 		//could even do if (req.session.user) {...}, but might cause cross-board log username contamination
-		if (isStaffOrGlobal) {
+		if (isMod) {
 			logUser = req.session.user;
 		}
 		for (let i = 0; i < res.locals.posts.length; i++) {
@@ -612,7 +611,7 @@ module.exports = async (req, res, next) => {
 						}
 					});
 
-				} else if (req.body.lock || req.body.bumplock || req.body.cyclic || req.body.unlink_file) {
+				} else if (req.body.lock || req.body.bumplock || req.body.cyclic) {
 
 					buildQueue.push({
 						'task': 'buildBoardMultiple',

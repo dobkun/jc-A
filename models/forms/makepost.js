@@ -3,6 +3,7 @@
 const { createHash, randomBytes } = require('crypto')
 	, randomBytesAsync = require('util').promisify(randomBytes)
 	, { remove, emptyDir, pathExists, stat: fsStat } = require('fs-extra')
+	, path = require('path')
 	, uploadDirectory = require(__dirname+'/../../lib/file/uploaddirectory.js')
 	, Mongo = require(__dirname+'/../../db/db.js')
 	, Socketio = require(__dirname+'/../../lib/misc/socketio.js')
@@ -60,8 +61,8 @@ module.exports = async (req, res) => {
 	let redirect = `/${req.params.board}/`;
 	let salt = null;
 	let thread = null;
-	const isStaffOrGlobal = res.locals.permissions.hasAny(Permissions.MANAGE_GLOBAL_GENERAL, Permissions.MANAGE_BOARD_GENERAL);
-	const isAdmin = res.locals.permissions.hasAny(Permissions.VIEW_RAW_IP);
+	const isMod = res.locals.permissions.get(Permissions.VIEW_MANAGE);
+	const canBypassLock = res.locals.permissions.hasAny(Permissions.MANAGE_BOARD_SETTING);
 	const { blockedCountries, threadLimit, ids, userPostSpoiler,
 		pphTrigger, tphTrigger, tphTriggerAction, pphTriggerAction,
 		sageOnlyEmail, forceAnon, replyLimit, disableReplySubject,
@@ -70,7 +71,7 @@ module.exports = async (req, res) => {
 	//
 	// Check if country is blocked
 	//
-	if (!isStaffOrGlobal
+	if (!isMod
 		// && !res.locals.permissions.get(Permissions.BYPASS_FILTERS) //TODO: new permission for "bypass blocks" or something
 		&& res.locals.country
 		&& blockedCountries.includes(res.locals.country.code)) {
@@ -86,7 +87,7 @@ module.exports = async (req, res) => {
 	// Check if board/thread creation locked
 	//
 	if ((lockMode === 2 || (lockMode === 1 && !req.body.thread)) //if board lock, or thread lock and its a new thread
-		&& !isAdmin) { // and not admin
+		&& !canBypassLock) { // and not admin
 		await deleteTempFiles(req).catch(console.error);
 		return dynamicResponse(req, res, 400, 'message', {
 			'title': __('Bad request'),
@@ -116,7 +117,7 @@ module.exports = async (req, res) => {
 		redirect += `thread/${req.body.thread}.html`;
 
 		// If thread locked, delete reply
-		if (thread.locked && !isAdmin) {
+		if (thread.locked && !canBypassLock) {
 			await deleteTempFiles(req).catch(console.error);
 			return dynamicResponse(req, res, 400, 'message', {
 				'title': __('Bad request'),
@@ -281,7 +282,7 @@ module.exports = async (req, res) => {
 			//get metadata
 			let processedFile = {
 				filename: file.filename,
-				spoiler: (!isStaffOrGlobal || userPostSpoiler) && req.body.spoiler && req.body.spoiler.includes(file.sha256),
+				spoiler: (!isMod || userPostSpoiler) && req.body.spoiler && req.body.spoiler.includes(file.sha256),
 				hash: file.sha256,
 				originalFilename: req.body.strip_filename && req.body.strip_filename.includes(file.sha256) ? file.filename : file.name,
 				mimetype: file.mimetype,
@@ -464,12 +465,13 @@ module.exports = async (req, res) => {
 		};
 	}
 	if (customFlags === true) {
-		if (req.body.customflag && res.locals.board.flags[req.body.customflag] != null) {
+		if (req.body.customflag) {
+			const name = path.parse(req.body.customflag).name;
 			//if customflags allowed, and its a valid selection
 			country = {
-				name: req.body.customflag,
-				code: req.body.customflag,
-				src: res.locals.board.flags[req.body.customflag],
+				name: name,
+				code: name,
+				src: req.body.customflag,
 				custom: true, //this will help
 			};
 		}
@@ -480,10 +482,10 @@ module.exports = async (req, res) => {
 	}
 
 	//spoiler files only if board settings allow
-	const spoiler = (!isStaffOrGlobal || userPostSpoiler) && req.body.spoiler_all ? true : false;
+	const spoiler = (!isMod || userPostSpoiler) && req.body.spoiler_all ? true : false;
 
 	//forceanon and sageonlyemail only allow sage email
-	let email = (isStaffOrGlobal || (!forceAnon && !sageOnlyEmail) || req.body.email === 'sage') ? req.body.email : null;
+	let email = (isMod || (!forceAnon && !sageOnlyEmail) || req.body.email === 'sage') ? req.body.email : null;
 	let nohide = false;
 	if (email && email !== 'sage') {
 		nohide = email.includes('nohide');
@@ -495,16 +497,13 @@ module.exports = async (req, res) => {
 		}
 	}
 	//disablereplysubject
-	let subject = (!isStaffOrGlobal && req.body.thread && disableReplySubject) ? null : req.body.subject;
+	let subject = (!isMod && req.body.thread && disableReplySubject) ? null : req.body.subject;
 
 	//get name, trip and cap
 	const { name, tripcode, capcode } = await nameHandler(
 		req.body.name,
 		res.locals.permissions,
 		res.locals.board.settings,
-		res.locals.board.owner,
-		res.locals.board.staff,
-		res.locals.user ? res.locals.user.username : null,
 		__ //i18n translation local
 	);
 	//get message, quotes and crossquote array

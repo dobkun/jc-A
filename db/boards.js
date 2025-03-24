@@ -10,6 +10,10 @@ const Mongo = require(__dirname+'/db.js')
 module.exports = {
 
 	db,
+	
+	getAll: async () => {
+		return db.find({}).toArray();
+	},
 
 	findOne: async (name) => {
 		let board = await cache.get(`board:${name}`);
@@ -18,42 +22,12 @@ module.exports = {
 		} else {
 			board = await db.findOne({ '_id': name });
 			if (board) {
-				//should really handle this in every db find
-				for (let staff in board.staff) {
-					board.staff[staff].permissions = board.staff[staff].permissions.toString('base64');
-				}
 				cache.set(`board:${name}`, board, 3600);
-				if (board.banners.length > 0) {
-					cache.sadd(`banners:${name}`, board.banners);
-				}
 			} else {
 				cache.set(`board:${name}`, 'no_exist', 600);
 			}
 		}
 		return board;
-	},
-
-	getStaffPerms: async (boards, username) => {
-		return db.find({
-			'_id': {
-				'$in': boards,
-			}
-		}, {
-			'projection': {
-				[`staff.${username}.permissions`]: 1,
-			}
-		}).toArray();
-	},
-
-	randomBanner: async (name) => {
-		let banner = await cache.srand(`banners:${name}`);
-		if (!banner) {
-			const board = await module.exports.findOne(name);
-			if (board) {
-				banner = board.banners[Math.floor(Math.random()*board.banners.length)];
-			}
-		}
-		return banner;
 	},
 
 	insertOne: (data) => {
@@ -66,7 +40,6 @@ module.exports = {
 
 	deleteOne: (board) => {
 		cache.del(`board:${board}`);
-		cache.del(`banners:${board}`);
 		cache.srem('boards:listed', board);
 		cache.srem('triggered', board);
 		return db.deleteOne({ '_id': board });
@@ -90,66 +63,6 @@ module.exports = {
 
 	deleteAll: () => {
 		return db.deleteMany({});
-	},
-
-	addStaff: async (board, username, permissions, setOwner=false) => {
-		const update = {
-			'$set': {
-				[`staff.${username}`]: {
-					'permissions': Mongo.Binary(permissions.array),
-					'addedDate': new Date(),
-				},
-			},
-		};
-		if (setOwner === true) {
-			update['$set']['owner'] = username;
-		}
-		const res = db.updateOne({
-			'_id': board,
-		}, update);
-		cache.del(`board:${board}`);
-		return res;
-	},
-
-	removeStaff: (board, usernames) => {
-		cache.del(`board:${board}`);
-		const unsetObject = usernames.reduce((acc, username) => {
-			acc[`staff.${username}`] = '';
-			return acc;
-		}, {});
-		return db.updateOne(
-			{
-				'_id': board,
-			}, {
-				'$unset': unsetObject,
-			}
-		);
-	},
-	
-	setStaffPermissions: (board, username, permissions, setOwner = false) => {
-		cache.del(`board:${board}`);
-		const update = {
-			'$set': {
-				[`staff.${username}.permissions`]: Mongo.Binary(permissions.array),
-			}
-		};
-		if (setOwner === true) {
-			update['$set']['owner'] = username;
-		}
-		return db.updateOne({
-			'_id': board,
-		}, update);
-	},
-
-	setOwner: (board, username = null) => {
-		cache.del(`board:${board}`);
-		return db.updateOne({
-			'_id': board,
-		}, {
-			'$set': {
-				'owner': username,
-			},
-		});
 	},
 
 	addToArray: (board, key, list) => {
@@ -179,18 +92,6 @@ module.exports = {
 		);
 	},
 
-	removeBanners: (board, filenames) => {
-		cache.del(`board:${board}`);
-		cache.del(`banners:${board}`);
-		return module.exports.removeFromArray(board, 'banners', filenames);
-	},
-
-	addBanners: (board, filenames) => {
-		cache.del(`board:${board}`);
-		cache.del(`banners:${board}`);
-		return module.exports.addToArray(board, 'banners', filenames);
-	},
-
 	removeAssets: (board, filenames) => {
 		cache.del(`board:${board}`);
 		return module.exports.removeFromArray(board, 'assets', filenames);
@@ -199,18 +100,6 @@ module.exports = {
 	addAssets: (board, filenames) => {
 		cache.del(`board:${board}`);
 		return module.exports.addToArray(board, 'assets', filenames);
-	},
-
-	setFlags: (board, flags) => {
-		cache.del(`board:${board}`);
-		//could use dot notation and set flags.x for only changes? seems a bit unsafe though and couldnt have . in name
-		return db.updateOne({
-			'_id': board,
-		}, {
-			'$set': {
-				'flags': flags,
-			}
-		});
 	},
 
 	getLocalListed: async () => {
@@ -269,12 +158,7 @@ module.exports = {
 			if (filter.filter_unlisted) {
 				addedFilter['settings.unlistedLocal'] = true;
 			}
-			if (filter.filter_abandoned) {
-				addedFilter['owner'] = null;
-			}
 			addedFilter['webring'] = false;
-			projection['staff'] = 1;
-			projection['owner'] = 1;
 		}
 		if (filter.search) {
 			const prefixRegExp = new RegExp(`^${escapeRegExp(filter.search)}`, 'i');
@@ -311,28 +195,6 @@ module.exports = {
 		}).toArray();
 	},
 	
-	getAbandoned: (action=0) => {
-		const filter = {
-			'webring': false,
-			'owner': null,
-		};
-		if (action === 1) {
-			//if just locking, only match unlocked boards
-			filter['settings.lockMode'] = { '$lt': 2 };
-		} else if (action === 2) {
-			//if locking+unlisting, match ones that satisfy any of the conditions
-			filter['$or'] = [
-				{ 'settings.unlistedWebring': false },
-				{ 'settings.unlistedLocal': false },
-				{ 'settings.lockMode': { '$lt': 2 } },
-			];
-		}
-		//else we return boards purely based on owner: null because they are going to be deleted anyway
-		return db
-			.find(filter)
-			.toArray();
-	},
-
 	unlistMany: (boards) => {
 		const update = {
 			'settings.lockMode': 2,
@@ -367,9 +229,6 @@ module.exports = {
 			}
 			if (filter.filter_unlisted) {
 				addedFilter['settings.unlistedLocal'] = true;
-			}
-			if (filter.filter_abandoned) {
-				addedFilter['owner'] = null;
 			}
 			addedFilter['webring'] = false;
 		}

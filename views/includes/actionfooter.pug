@@ -7,10 +7,6 @@ details.toggle-label#actionform
 			label
 				input.post-check(type='checkbox', name='delete' value='1')
 				| #{__('Delete Posts')}
-		//- if board.settings.userPostUnlink
-			label
-				input.post-check(type='checkbox', name='unlink_file' value='1')
-				| #{__('Unlink Files')}
 		if board.settings.userPostSpoiler
 			label
 				input.post-check(type='checkbox', name='spoiler' value='1')
@@ -18,7 +14,7 @@ details.toggle-label#actionform
 		if board.settings.userPostSpoiler || board.settings.userPostUnlink || board.settings.userPostDelete
 			label
 				input#password(type='password', name='postpassword', placeholder=__('Password') autocomplete='off')
-		label
+		//- label
 			input.post-check(type='checkbox', name='report' value='1')
 			| #{__('Report')}
 		label

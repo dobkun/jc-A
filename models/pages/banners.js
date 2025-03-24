@@ -1,12 +1,14 @@
 'use strict';
 
-const { buildBanners } = require(__dirname+'/../../lib/build/tasks.js');
+const { buildBanners } = require(__dirname+'/../../lib/build/tasks.js')
+	, { Assets } = require(__dirname+'/../../db/index.js');
 
 module.exports = async (req, res, next) => {
 
 	let html, json;
 	try {
-		({ html, json } = await buildBanners({ board: res.locals.board }));
+		const banners = await Assets.getBanners();
+		({ html, json } = await buildBanners({'banners': banners}));
 	} catch (err) {
 		return next(err);
 	}

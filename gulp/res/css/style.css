@@ -545,7 +545,7 @@ p {
 
 .glowtext {
 	color: var(--input-color); /*Is always white or black as defined by themes.*/
-    text-shadow: 0 0 2px #16ff16,0 0 20px #00f000,0 0 30px #006800;
+	text-shadow: 0 0 2px #16ff16,0 0 20px #00f000,0 0 30px #006800;
 }
 
 .embimg {
@@ -596,7 +596,7 @@ th {
 }
 
 .fw td, .fw th {
-    width: 8%; /*Fixes log tables when large actions are taken*/
+	width: 8%; /*Fixes log tables when large actions are taken*/
 }
 
 td, th {
@@ -765,7 +765,7 @@ details.actions div {
 	overflow: hidden;
 	margin-right: 1px;
 	position: absolute;
-    right: 0;
+	right: 0;
 	padding: 8px;
 }
 
@@ -870,6 +870,10 @@ span.captchacheckbox {
 
 .user-id:hover::after {
 	content: attr(data-count);
+}
+
+.modified {
+	background-color: #ffe60080;
 }
 
 .post-check {
@@ -1482,46 +1486,31 @@ table.boardtable .nobreak {
 	pointer-events: none;
 }
 
-.post-file-src .overlay-text {
-	/* offset to center over image */
-    position: absolute;
-	top: 10px;
-    left: 50%;
-    transform: translate(-50%, 0%);
-
+.file-approval-text {
 	/* don't select or click text */
 	user-select: none;
 	pointer-events: none;
-    
+	
 	/* text formatting */
-    color: red;
+	color: red;
 	font-size: 1rem;
 	text-align: center;
-    text-shadow: 2px 2px 10px black;
 }
 
-.approval-button-container {
+.file-approval-button-container {
 	display: flex;
 	width: 100%;
 } 
-
-input.nsfw-button {
-	flex: 1;
-	background-color: yellow;
-	text-align: center;
-	color: black;
-	font-weight: bold;
-}
 
 input.approve-button {
 	flex: 2;
 	background-color: green;
 	text-align: center;
-	color: black;
+	color: white;
 	font-weight: bold;
 }
 
-input.illegal-button {
+input.deny-button {
 	flex: 1;
 	background-color: red;
 	text-align: center;
