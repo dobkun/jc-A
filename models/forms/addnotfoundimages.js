@@ -64,8 +64,8 @@ module.exports = async (req, res) => {
 	const filenames = [];
 	for (let i = 0; i < res.locals.numFiles; i++) {
 		const file = req.files.file[i];
-		file.filename = file.sha256 + file.extension;
-
+		file.filename = file.name;
+		
 		//check if already exists
 		const exists = await pathExists(`${uploadDirectory}/notfoundimage/${file.filename}`);
 
