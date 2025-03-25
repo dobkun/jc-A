@@ -304,8 +304,8 @@ object {
 	padding: 5px;
 	margin: 5px;
 	text-align: center;
-	height: 340;
-	width: 280px;
+	height: 280px;
+	width: 220px;
 	overflow: hidden;
 	border: 1px solid var(--post-outline-color);
 	box-sizing: border-box;
