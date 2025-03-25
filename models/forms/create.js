@@ -4,7 +4,7 @@ const { Boards, Modlogs } = require(__dirname+'/../../db/')
 	, ModlogActions = require(__dirname+'/../../lib/input/modlogactions.js')
 	, dynamicResponse = require(__dirname+'/../../lib/misc/dynamic.js')
 	, uploadDirectory = require(__dirname+'/../../lib/file/uploaddirectory.js')
-	, restrictedURIs = new Set(['captcha', 'forms', 'randombanner', 'all'])
+	, restrictedURIs = new Set(['captcha', 'forms', 'randomnotfoundimage', 'randombanner', 'all'])
 	, { ensureDir } = require('fs-extra')
 	, config = require(__dirname+'/../../lib/misc/config.js');
 
@@ -39,15 +39,12 @@ module.exports = async (req, res) => {
 	const newBoard = {
 		'_id': uri,
 		tags,
-		'banners': [],
 		'sequence_value': 1,
 		'pph': 0,
 		'ppd': 0,
 		'ips': 0,
 		'lastPostTimestamp': null,
 		'webring': false,
-		'flags': {},
-		'assets': [],
 		'settings': {
 			name,
 			description,
@@ -74,7 +71,6 @@ module.exports = async (req, res) => {
 		Boards.insertOne(newBoard),
 		ensureDir(`${uploadDirectory}/html/${uri}`),
 		ensureDir(`${uploadDirectory}/json/${uri}`),
-		ensureDir(`${uploadDirectory}/asset/${uri}`),
 	]);
 
 	return res.redirect(`/${req.body.uri}/index.html`);

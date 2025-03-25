@@ -4,7 +4,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	if (banner) {
 		banner.addEventListener('click', function() {
 			// append some garbage so cache not used
-			this.src = this.src + '&t=' + new Date().getTime();
+			this.src = `/randombanner?t=${new Date().getTime()}`;
 		});
 	}
 });

@@ -526,6 +526,14 @@ p {
 	color: var(--title-color);
 }
 
+img.not-found-image {
+	display: block;
+ 	margin: 0 auto;
+	width: 100%;
+  	max-width: 800px;
+  	height: auto;
+}
+
 #bottom {
 	margin-bottom: 10px;
 }

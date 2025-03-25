@@ -58,8 +58,8 @@ module.exports = {
 	randomBanner: async () => {
 		let banner = await cache.srand('banners');
 		if (!banner) {
-			const banners = await db.getBanners();
-			if (banners) {
+			const banners = await module.exports.getBanners();
+			if (banners.length > 0) {
 				banner = banners[Math.floor(Math.random()*banners.length)];
 			}
 		}
@@ -123,8 +123,8 @@ module.exports = {
 	randomNotFoundImage: async () => {
 		let notfoundimage = await cache.srand('notfoundimages');
 		if (!notfoundimage) {
-			const notfoundimages = await db.getNotFoundImages();
-			if (notfoundimages) {
+			const notfoundimages = await module.exports.getNotFoundImages();
+			if (notfoundimages.length > 0) {
 				notfoundimage = notfoundimages[Math.floor(Math.random()*notfoundimages.length)];
 			}
 		}
