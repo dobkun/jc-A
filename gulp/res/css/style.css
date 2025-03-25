@@ -112,14 +112,10 @@ pre {
 	background: var(--navbar-color);
 	box-shadow: 0 0 3px 1px var(--darken);
 	border-bottom: 1px solid var(--post-outline-color);
-	position: sticky;
+	position: fixed;
 	width: 100%;
 	z-index: 2;
 	top: 0;
-	@media only screen and (max-width: 600px) {
-		display: grid;
-		grid-template-columns: auto auto auto;
-	}
 }
 
 .replies {
@@ -230,6 +226,9 @@ pre {
 #settings, .dummy-link {
 	cursor: pointer;
 }
+#settings::after {
+	content: attr(data-label);
+}
 .expand-omitted {
 	background-color: var(--post-color);
 	border: 1px solid var(--font-color);
@@ -305,8 +304,8 @@ object {
 	padding: 5px;
 	margin: 5px;
 	text-align: center;
-	height: 220px;
-	width: 220px;
+	height: 340;
+	width: 280px;
 	overflow: hidden;
 	border: 1px solid var(--post-outline-color);
 	box-sizing: border-box;
@@ -1211,15 +1210,8 @@ input:invalid, textarea:invalid {
 	border: none;
 }
 
-.navbar-img {
-	max-height:20vh;
-	height: 50px;
-	@media only screen and (max-width: 600px) {
-		height: 10vw;
-	}
-}
-
 .nav-item {
+	line-height: 2em;
 	text-decoration: none;
 	float: left;
 	padding-left: 10px;
@@ -1602,7 +1594,9 @@ table, .boardtable {
 	white-space: nowrap;
 }
 
-
+#settings::after {
+	content: "\2699"!important;
+}
 #settingsmodal{
 	min-width: 400px;
 }
