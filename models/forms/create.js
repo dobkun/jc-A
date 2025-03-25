@@ -74,8 +74,6 @@ module.exports = async (req, res) => {
 		Boards.insertOne(newBoard),
 		ensureDir(`${uploadDirectory}/html/${uri}`),
 		ensureDir(`${uploadDirectory}/json/${uri}`),
-		ensureDir(`${uploadDirectory}/banner/${uri}`),
-		ensureDir(`${uploadDirectory}/flag/${uri}`),
 		ensureDir(`${uploadDirectory}/asset/${uri}`),
 	]);
 

@@ -31,7 +31,7 @@ const express  = require('express')
 		globalSettingsController, createBoardController, makePostController,
 		editCustomPageController, editPostController, editRoleController, newCaptchaForm, 
 		blockBypassForm, logoutForm, deleteSessionsController, globalClearController, addTrustedController,
-		deleteTrustedController } = require(__dirname+'/forms/index.js');
+		deleteTrustedController, addNotFoundImagesController, /*deleteNotFoundImagesController*/ } = require(__dirname+'/forms/index.js');
 
 //make new post
 router.post('/board/:board/post', geoIp, processIp, useSession, sessionRefresh, Boards.exists, setBoardLanguage, calcPerms, banCheck, fileMiddlewares.posts,
@@ -76,6 +76,12 @@ router.post('/addflags', geoIp, useSession, sessionRefresh, fileMiddlewares.flag
 	hasPerms.one(Permissions.MANAGE_ASSETS), numFiles, addFlagsController.controller); //add flags
 router.post('/deleteflags', useSession, sessionRefresh, csrf, calcPerms, isLoggedIn,
 	hasPerms.one(Permissions.MANAGE_ASSETS), deleteFlagsController.paramConverter, deleteFlagsController.controller); //delete flags
+router.post('/addnotfoundimages', geoIp, useSession, sessionRefresh, fileMiddlewares.asset, csrf, calcPerms, isLoggedIn,
+	hasPerms.one(Permissions.MANAGE_ASSETS), numFiles, addNotFoundImagesController.controller); // add ban images
+/*
+router.post('/deletenotfoundimages', useSession, sessionRefresh, csrf, calcPerms, isLoggedIn,
+	hasPerms.one(Permissions.MANAGE_ASSETS), deleteNotFoundImagesController.paramConverter, deleteNotFoundImagesController.controller); // delete ban images
+*/
 
 /*
 router.post('/addassets', geoIp, useSession, sessionRefresh, fileMiddlewares.asset, csrf, calcPerms, isLoggedIn,

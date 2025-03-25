@@ -38,6 +38,8 @@ module.exports = {
 	editRoleController: require(__dirname+'/editrole.js'),
 	addTrustedController: require(__dirname+'/addtrusted.js'),
 	deleteTrustedController: require(__dirname+'/deletetrusted.js'),
+	addNotFoundImagesController: require(__dirname+'/addnotfoundimages.js'),
+	// deleteNotFoundImagesController: require(__dirname+'/deletenotfoundimages.js'),
 
 	//these dont have a "real" controller
 	newCaptchaForm: require(__dirname+'/../../models/forms/newcaptcha.js'),

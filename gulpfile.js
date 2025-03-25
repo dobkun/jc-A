@@ -288,6 +288,7 @@ async function wipe() {
 		del([ 'static/json/*' ]),
 		del([ 'static/banner/*' ]),
 		del([ 'static/flag/*' ]),
+		del([ 'static/notfoundimage/*' ]),
 		del([ 'static/asset/*' ]),
 		del([ 'static/css/*' ]),
 		del([ 'static/js/*' ]),
@@ -296,6 +297,9 @@ async function wipe() {
 	return Promise.all([
 		fs.ensureDir(`${uploadDirectory}/captcha`),
 		fs.ensureDir(`${uploadDirectory}/file/thumb`),
+		fs.ensureDir(`${uploadDirectory}/banner`),
+		fs.ensureDir(`${uploadDirectory}/flag`),
+		fs.ensureDir(`${uploadDirectory}/notfoundimage`),
 		fs.ensureDir(paths.scripts.dest),
 	]);
 
@@ -416,7 +420,9 @@ async function cache() {
 		Redis.deletePattern('boards:listed'),
 		Redis.deletePattern('board:*'),
 		Redis.deletePattern('boardlist:*'),
-		Redis.deletePattern('banners:*'),
+		Redis.deletePattern('banners'),
+		Redis.deletePattern('flags'),
+		Redis.deletePattern('notfoundimages'),
 		Redis.deletePattern('users:*'),
 		Redis.deletePattern('blacklisted:*'),
 		Redis.deletePattern('overboard:*'),

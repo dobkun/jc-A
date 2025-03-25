@@ -102,4 +102,42 @@ module.exports = {
 		cache.del('flags');
 		return module.exports.removeFromArray('flags', files);
 	},
+	
+	getNotFoundImages: async () => {
+		let notfoundimages = await cache.sgetall('notfoundimages');
+		if (notfoundimages.length === 0) {
+			let assets = await db.findOne(
+				{ _id: 'assets' },
+				{ notfoundimages: 1, _id: 0}
+			);
+			
+			if (assets && assets.notfoundimages) {
+				cache.sadd('notfoundimages', assets.notfoundimages);
+				notfoundimages = assets.notfoundimages;
+			}
+		}
+
+		return notfoundimages;
+	},
+	
+	randomNotFoundImage: async () => {
+		let notfoundimage = await cache.srand('notfoundimages');
+		if (!notfoundimage) {
+			const notfoundimages = await db.getNotFoundImages();
+			if (notfoundimages) {
+				notfoundimage = notfoundimages[Math.floor(Math.random()*notfoundimages.length)];
+			}
+		}
+		return notfoundimage;
+	},
+
+	addNotFoundImages: (filenames) => {
+		cache.del('notfoundimages');
+		return module.exports.addToArray('notfoundimages', filenames);
+	},
+
+	removeNotFoundImages: (filenames) => {
+		cache.del('notfoundimages');
+		return module.exports.removeFromArray('notfoundimages', filenames);
+	},
 };
