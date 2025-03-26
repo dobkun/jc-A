@@ -209,12 +209,6 @@ module.exports = async (req, res) => {
 				'board': res.locals.board,
 			}
 		});
-		buildQueue.push({
-			'task': 'buildBanners',
-			'options': {
-				'board': res.locals.board,
-			}
-		});
 	}
 
 	//updates board/settings.json
