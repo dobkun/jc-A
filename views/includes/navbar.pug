@@ -6,11 +6,11 @@ unless minimal
 			if enableWebring
 				.rainbow +Webring
 		a.nav-item#overboardlink(href='/overboard.html') #{__('Overboard')}
-		a.nav-item#overboardlink(href='/news.html') #{__('News')}
-		a.nav-item#overboardlink(href='/rules.html') #{__('Rules')}
-		a.nav-item#overboardlink(href='/bans.html') #{__('Bans')}
-		a.nav-item#overboardlink(href='/banners.html') #{__('Banners')}
-		a.nav-item#overboardlink(href='/pages.html') #{__('Pages')}
+		a.nav-item(href='/news.html') #{__('News')}
+		a.nav-item(href='/rules.html') #{__('Rules')}
+		a.nav-item(href='/bans.html') #{__('Bans')}
+		a.nav-item(href='/banners.html') #{__('Banners')}
+		a.nav-item(href='/pages.html') #{__('Pages')}
 		a.nav-item(href='/account.html') #{__('Account')}
 		if !modview && board
 			a.nav-item(href=`/${board._id}/manage/${managePage || 'index.html'}`) #{__('Manage')}
