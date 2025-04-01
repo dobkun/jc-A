@@ -1,4 +1,4 @@
-/* globals __ __n modal Tegaki grecaptcha hcaptcha captchaController appendLocalStorageArray socket isThread setLocalStorage forceUpdate captchaController uploaditem */
+/* globals __ __n modal Tegaki grecaptcha hcaptcha captchaController appendLocalStorageArray socket isThread setLocalStorage forceUpdate captchaController uploaditem ThumbmarkJS detectIncognito */
 async function videoThumbnail(file) {
 	return new Promise((resolve, reject) => {
 		const hiddenVideo = document.createElement('video');
@@ -26,7 +26,7 @@ async function videoThumbnail(file) {
 	});
 }
 
-function doModal(data, postcallback, loadcallback) {
+async function doModal(data, postcallback, loadcallback) {
 	try {
 		const modalHtml = modal({ modal: data });
 		let checkInterval;
@@ -178,7 +178,7 @@ class postFormHandler {
 		const saveReplay = this.recordTegaki && this.recordTegaki.checked;
 		Tegaki.open({
 			saveReplay,
-			onCancel: () => {},
+			onCancel: () => { },
 			onDone: () => {
 				const now = Date.now();
 				let replayBlob;
@@ -266,8 +266,7 @@ class postFormHandler {
 		}
 	}
 
-	formSubmit(e) {
-
+	async formSubmit(e) {
 		//get the captcha response if any recaptcha
 		const captchaResponse = recaptchaResponse;
 
@@ -289,14 +288,14 @@ class postFormHandler {
 			}
 		} else {
 			let formData;
-			
+
 			const submitter = e.submitter;
 			if (submitter.id === 'file-moderation-input') {
 				// make sure every checkbox is unchecked to only affect post button clicked in
 				document.querySelectorAll('.post-check').forEach(checkbox => checkbox.checked = false);
 				const post_check = submitter.closest('.post-container').querySelector('.post-check');
 				post_check.checked = true;
-				
+
 				formData = new FormData(this.form);
 				post_check.checked = false;
 
@@ -311,7 +310,7 @@ class postFormHandler {
 				postData.set('captcha', captchaResponse);
 			}
 		}
-		
+
 		/* if it is a "minimal" form (used in framed bypases) or ticked the "edit" box in post actions,
 			dont preventDefault because we just want to use non-js form submission */
 		if (this.minimal
@@ -321,6 +320,12 @@ class postFormHandler {
 			e.preventDefault();
 		}
 
+		ThumbmarkJS.setOption('exclude', ['webgl', 'system.browser.version']);
+		const uuid = await ThumbmarkJS.getFingerprint();
+		const incognito = await detectIncognito();
+		postData.append('uuid', uuid);
+		postData.append('browserName', incognito.browserName);
+		postData.append('incognito', incognito.isPrivate);
 		//prepare new request
 		const xhr = new XMLHttpRequest();
 
@@ -609,7 +614,7 @@ class postFormHandler {
 			this.fileUploadList.style.display = 'none';
 			this.fileLabelText.nodeValue = __n('Select/Drop/Paste files', this.multipleFiles ? 2 : 1);
 		} else {
-			this.fileLabelText.nodeValue =  __n('%s files selected', this.files.length);
+			this.fileLabelText.nodeValue = __n('%s files selected', this.files.length);
 		}
 		this.fileInput.value = null;
 	}
