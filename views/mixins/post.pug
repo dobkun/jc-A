@@ -105,7 +105,6 @@ mixin post(post, truncate, manage=false, globalmanage=false, ban=false, overboar
 					if !post.thread
 						option(value='watch') #{__('Watch')}
 						option(value='playlist') #{__('Playlist')}
-						option(value='archive') Archive
 		.post-data
 			if post.files.length > 0
 				.post-files(class=(post.files.length > 1 ? 'fn' : ''))
@@ -117,10 +116,13 @@ mixin post(post, truncate, manage=false, globalmanage=false, ban=false, overboar
 							if file.approved || manage || modview || globalmanage
 								span.post-file-info
 									span
-										a.filename(href='/file/'+file.filename title='Download '+file.originalFilename download=file.originalFilename) #{post.spoiler || file.spoiler ? __('Spoiler File') : file.originalFilename}
+										a.filename(href=`/file/${file.filename}` title=`Download ${file.originalFilename}` download=file.originalFilename) #{post.spoiler || file.spoiler ? __('Spoiler File') : file.originalFilename}
 										|
 										|
-										a.filename(href='/file/'+file.filename title='Download '+file.originalFilename download=post.u+fileindex+' '+file.originalFilename) #{post.spoiler || file.spoiler ? __('Spoiler File') : 'Archive'}
+										a.filename(href=`/file/${file.filename}` title='Download Unix timestamp' download=`${post.u}${fileindex > 0 ? String.fromCharCode(97 + fileindex - 1) : ''}${file.extension}`) #{'U'}
+										|
+										|
+										a.filename(href=`/file/${file.filename}` title='Download Archive format' download=`${post.u} ${file.originalFilename}`) #{'A'}
 									br
 									if globalmanage && file.phash != null
 										span #{file.phash}
@@ -139,7 +141,7 @@ mixin post(post, truncate, manage=false, globalmanage=false, ban=false, overboar
 										| )
 									if type === 'image'
 										if (board && board.settings.reverseImageSearchLinks === true) || (overboard && overboardReverseLinks === true) || manage || modview || globalmanage
-											|  
+											br
 											span: a(href=`${reverseImageLinksURL.replace('%s', encodeURIComponent(meta.url+'/file/'+file.filename))}` rel='nofollow' referrerpolicy='same-origin' title=__('Reverse Image Search') target='_blank') #{__('Reverse')}
 										if file.originalFilename.endsWith('-tegaki.png')
 											- const matchingReplayFile = post.files.find(f => f.originalFilename.slice(0, -4) === file.originalFilename.slice(0,-3));
