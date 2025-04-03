@@ -135,6 +135,11 @@ pre {
 	}
 }
 
+.stickynav .nav-item {
+	height: 1em;
+	line-height: 1em;
+}
+
 .nav-item img {
 	height: 100%;
 	width: auto;
