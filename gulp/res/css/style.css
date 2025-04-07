@@ -20,13 +20,9 @@ main.minimal {
 	height: 100vh;
 }
 
-.homepage-image {
-	width: 168px;
+.logo {
+	width: 128px;
 	height: auto;
-
-	@media (max-width: 600px) {
-		width: 124px;
-	}
 }
 
 .faq-image {
@@ -119,20 +115,33 @@ pre {
 	box-shadow: 0 0 3px 1px var(--darken);
 	border-bottom: 1px solid var(--post-outline-color);
 	position: fixed;
+	top: 0;
 	width: 100%;
 	z-index: 2;
-	top: 0;
 }
 
 .nav-item {
-	position: relative;
 	display: inline-block;
+	position: relative;
 	text-decoration: none;
 	height: 48px;
+	font-size: 1.5em;
+	line-height: 48px;
+	width: auto;
+	vertical-align: top;
+}
 
-	@media (max-width: 600px) {
+@media (max-width: 600px) {
+	.nav-item {
 		height: 24px;
+		font-size: 1em;
+		line-height: 24px;
 	}
+}
+
+.nav-item img {
+	display: block;
+	object-fit: contain;
 }
 
 .stickynav .nav-item {
@@ -357,6 +366,22 @@ object {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+}
+
+.board-ad-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.board-ad {
+	width: 468px;
+	height: 60px;
+
+	@media (max-width: 600px) {
+		width: 234px;
+		height: 30px;
+	}
 }
 
 .catalog-tile {
@@ -1139,6 +1164,19 @@ textarea:invalid {
 	border: 1px solid var(--post-outline-color);
 	min-width: 300px;
 	min-height: 100px;
+}
+
+.asset-boardad {
+	margin: 0 5px;
+	max-width: 100%;
+	border: 1px solid var(--post-outline-color);
+	min-width: 468px;
+	min-height: 60px;
+
+	@media (max-width: 600px) {
+		min-width: 234px;
+		min-height: 30px;
+	}
 }
 
 .asset-generic {
