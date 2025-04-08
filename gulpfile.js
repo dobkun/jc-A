@@ -16,6 +16,7 @@ const config = require(__dirname + '/lib/misc/config.js')
 	, concat = require('gulp-concat')
 	, cleanCSS = require('gulp-clean-css')
 	, uglify = require('gulp-uglify-es').default
+	, javascriptObfuscator = require('gulp-javascript-obfuscator')
 	, realFavicon = require('gulp-real-favicon')
 	, del = require('del')
 	, pug = require('pug')
@@ -576,13 +577,14 @@ const extraLocals = ${JSON.stringify({ meta: config.get.meta, reverseImageLinksU
 		`!${paths.scripts.src}/renderweb3.js`,
 	])
 		.pipe(concat('all.js'))
-		.pipe(uglify({ compress: true }))
+		.pipe(javascriptObfuscator({ compact: true }))
 		.pipe(gulp.dest(paths.scripts.dest));
 
 	gulp.src([
 		__dirname + '/node_modules/@thumbmarkjs/thumbmarkjs/dist/thumbmark.umd.js',
 	])
 		.pipe(concat('secret.js'))
+		.pipe(javascriptObfuscator({ compact: true }))
 		.pipe(gulp.dest(paths.scripts.dest));
 
 	gulp.src([

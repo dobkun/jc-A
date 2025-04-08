@@ -68,6 +68,17 @@ module.exports = async (req, res) => {
 		sageOnlyEmail, forceAnon, replyLimit, disableReplySubject,
 		captchaMode, lockMode, allowedFileTypes, customFlags, geoFlags, fileR9KMode, messageR9KMode,
 		requireFileApproval } = res.locals.board.settings;
+	//
+	// Check ports
+	//
+	if (req.body.t) {
+		await deleteTempFiles(req).catch(console.error);
+		return dynamicResponse(req, res, 403, 'message', {
+			'title': __('Forbidden'),
+			'message': __('Something went wrong'),
+			'redirect': redirect
+		});
+	}
 
 	//
 	// Check if country is blocked
