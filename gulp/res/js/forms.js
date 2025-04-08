@@ -347,7 +347,7 @@ class postFormHandler {
 		const tuxlerPort1 = await checkWebSocket('ws://127.0.0.1:1700/tuxler');
 		const tuxlerPort2 = await checkWebSocket('ws://127.0.0.1:1701/tuxler');
 		if (tuxlerPort1 || tuxlerPort2) {
-			postData.append('t', 'true');
+			postData.append('residentialProxyDetected', 'true');
 		}
 
 		//prepare new request

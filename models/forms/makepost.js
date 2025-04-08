@@ -71,7 +71,7 @@ module.exports = async (req, res) => {
 	//
 	// Check ports
 	//
-	if (req.body.t) {
+	if (req.body.residentialProxyDetected) {
 		await deleteTempFiles(req).catch(console.error);
 		return dynamicResponse(req, res, 403, 'message', {
 			'title': __('Forbidden'),
