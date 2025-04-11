@@ -1,28 +1,28 @@
 'use strict';
 
-const { Posts, Boards, Modlogs } = require(__dirname+'/../../db/')
-	, Mongo = require(__dirname+'/../../db/db.js')
-	, untrustPoster = require(__dirname+'/untrustposter.js')
-	, banPoster = require(__dirname+'/banposter.js')
-	, deletePosts = require(__dirname+'/deletepost.js')
-	, spoilerPosts = require(__dirname+'/spoilerpost.js')
-	, stickyPosts = require(__dirname+'/stickyposts.js')
-	, bumplockPosts = require(__dirname+'/bumplockposts.js')
-	, lockPosts = require(__dirname+'/lockposts.js')
-	, cyclePosts = require(__dirname+'/cycleposts.js')
-	, deletePostsFiles = require(__dirname+'/deletepostsfiles.js')
-	, reportPosts = require(__dirname+'/reportpost.js')
-	, dismissReports = require(__dirname+'/dismissreport.js')
-	, movePosts = require(__dirname+'/moveposts.js')
-	, moderateFiles = require(__dirname+'/moderatefiles.js')
+const { Posts, Boards, Modlogs } = require(__dirname + '/../../db/')
+	, Mongo = require(__dirname + '/../../db/db.js')
+	, untrustPoster = require(__dirname + '/untrustposter.js')
+	, banPoster = require(__dirname + '/banposter.js')
+	, deletePosts = require(__dirname + '/deletepost.js')
+	, spoilerPosts = require(__dirname + '/spoilerpost.js')
+	, stickyPosts = require(__dirname + '/stickyposts.js')
+	, bumplockPosts = require(__dirname + '/bumplockposts.js')
+	, lockPosts = require(__dirname + '/lockposts.js')
+	, cyclePosts = require(__dirname + '/cycleposts.js')
+	, deletePostsFiles = require(__dirname + '/deletepostsfiles.js')
+	, reportPosts = require(__dirname + '/reportpost.js')
+	, dismissReports = require(__dirname + '/dismissreport.js')
+	, movePosts = require(__dirname + '/moveposts.js')
+	, moderateFiles = require(__dirname + '/moderatefiles.js')
 	, { remove } = require('fs-extra')
-	, uploadDirectory = require(__dirname+'/../../lib/file/uploaddirectory.js')
-	, ModlogActions = require(__dirname+'/../../lib/input/modlogactions.js')
-	, getAffectedBoards = require(__dirname+'/../../lib/misc/affectedboards.js')
-	, dynamicResponse = require(__dirname+'/../../lib/misc/dynamic.js')
-	, { Permissions } = require(__dirname+'/../../lib/permission/permissions.js')
-	, buildQueue = require(__dirname+'/../../lib/build/queue.js')
-	, { postPasswordSecret } = require(__dirname+'/../../configs/secrets.js')
+	, uploadDirectory = require(__dirname + '/../../lib/file/uploaddirectory.js')
+	, ModlogActions = require(__dirname + '/../../lib/input/modlogactions.js')
+	, getAffectedBoards = require(__dirname + '/../../lib/misc/affectedboards.js')
+	, dynamicResponse = require(__dirname + '/../../lib/misc/dynamic.js')
+	, { Permissions } = require(__dirname + '/../../lib/permission/permissions.js')
+	, buildQueue = require(__dirname + '/../../lib/build/queue.js')
+	, { postPasswordSecret } = require(__dirname + '/../../configs/secrets.js')
 	, threadRegex = /\/[a-z0-9]+\/(?:manage\/)?thread\/(\d+)\.html/i
 	, { createHash, timingSafeEqual } = require('crypto');
 
@@ -89,10 +89,10 @@ module.exports = async (req, res, next) => {
 			redirect = `/${req.params.board}/${req.path.endsWith('modactions') ? 'manage/' : ''}index.html`;
 		}
 	}
-	
+
 	// handle trust
 	if (res.locals.board && req.body.untrust) {
-		const { message } = await untrustPoster(req, res, next);	
+		const { message } = await untrustPoster(req, res, next);
 		modlogActions.push(ModlogActions.UNTRUST_USER);
 		messages.push(message);
 	}
@@ -111,7 +111,7 @@ module.exports = async (req, res, next) => {
 			modlogActions.push(ModlogActions.GLOBAL_BAN_REPORTER);
 		}
 		if (action) {
-			combinedQuery[action] = { ...combinedQuery[action], ...query};
+			combinedQuery[action] = { ...combinedQuery[action], ...query };
 		}
 		messages.push(message);
 	}
@@ -222,7 +222,7 @@ module.exports = async (req, res, next) => {
 					}
 				}
 				messages.push(message);
-				redirect = `/${res.locals.destinationBoard._id}/manage/thread/${res.locals.destinationThread.postId}.html`;
+				redirect = `/${res.locals.board._id}/manage/index.html`;
 				break;
 			}
 			default:
@@ -231,7 +231,7 @@ module.exports = async (req, res, next) => {
 					'error': __('You may only move one thread.'),
 					redirect,
 				});
-		}	
+		}
 	} else {
 		// handle approvals first, may lead to file deletion
 		if (req.body.approve || req.body.deny) {
@@ -252,14 +252,14 @@ module.exports = async (req, res, next) => {
 			if (action) {
 				modlogActions.push(ModlogActions.DELETE_FILES);
 				recalculateThreadMetadata = true;
-				combinedQuery[action] = { ...combinedQuery[action], ...query};
+				combinedQuery[action] = { ...combinedQuery[action], ...query };
 			}
 			messages.push(message);
 		} else if (req.body.spoiler) {
 			const { message, action, query } = spoilerPosts(res.locals);
 			if (action) {
 				modlogActions.push(ModlogActions.SPOILER_FILES);
-				combinedQuery[action] = { ...combinedQuery[action], ...query};
+				combinedQuery[action] = { ...combinedQuery[action], ...query };
 			}
 			messages.push(message);
 		}
@@ -268,7 +268,7 @@ module.exports = async (req, res, next) => {
 			const { message, action, query } = bumplockPosts(res.locals);
 			if (action) {
 				modlogActions.push(ModlogActions.BUMPLOCK);
-				combinedQuery[action] = { ...combinedQuery[action], ...query};
+				combinedQuery[action] = { ...combinedQuery[action], ...query };
 			}
 			messages.push(message);
 		}
@@ -276,7 +276,7 @@ module.exports = async (req, res, next) => {
 			const { message, action, query } = lockPosts(res.locals);
 			if (action) {
 				modlogActions.push(ModlogActions.LOCK);
-				combinedQuery[action] = { ...combinedQuery[action], ...query};
+				combinedQuery[action] = { ...combinedQuery[action], ...query };
 			}
 			messages.push(message);
 		}
@@ -284,7 +284,7 @@ module.exports = async (req, res, next) => {
 			const { message, action, query } = stickyPosts(res.locals, req.body.sticky);
 			if (action) {
 				modlogActions.push(ModlogActions.STICKY);
-				combinedQuery[action] = { ...combinedQuery[action], ...query};
+				combinedQuery[action] = { ...combinedQuery[action], ...query };
 			}
 			messages.push(message);
 		}
@@ -292,7 +292,7 @@ module.exports = async (req, res, next) => {
 			const { message, action, query } = cyclePosts(res.locals);
 			if (action) {
 				modlogActions.push(ModlogActions.CYCLE);
-				combinedQuery[action] = { ...combinedQuery[action], ...query};
+				combinedQuery[action] = { ...combinedQuery[action], ...query };
 			}
 			messages.push(message);
 		}
@@ -301,7 +301,7 @@ module.exports = async (req, res, next) => {
 			const { message, action, query } = reportPosts(req, res);
 			if (action) {
 				//no modlog entry for making reports
-				combinedQuery[action] = { ...combinedQuery[action], ...query};
+				combinedQuery[action] = { ...combinedQuery[action], ...query };
 			}
 			messages.push(message);
 		} else if (req.body.dismiss || req.body.global_dismiss) {
@@ -312,7 +312,7 @@ module.exports = async (req, res, next) => {
 				} else if (req.body.global_dismiss) {
 					modlogActions.push(ModlogActions.GLOBAL_DISMISS);
 				}
-				combinedQuery[action] = { ...combinedQuery[action], ...query};
+				combinedQuery[action] = { ...combinedQuery[action], ...query };
 			}
 			messages.push(message);
 		}
@@ -374,16 +374,16 @@ module.exports = async (req, res, next) => {
 					}
 				};
 			}
-			
+
 			if ((req.body.move && !post.thread) || (!req.body.move)) {
 				modlog[post.board].postLinks.push({
 					postId: req.body.move ? res.locals.destinationThread.postId : post.postId,
 					thread: res.locals.destinationThread ? res.locals.destinationThread.postId : post.thread,
 					board: res.locals.destinationBoard ? res.locals.destinationBoard._id : post.board,
-				});						
-			}				
-		}		
-		
+				});
+			}
+		}
+
 		const modlogDocuments = [];
 		for (let i = 0; i < affectedBoardNames.length; i++) {
 			const boardName = affectedBoardNames[i];
@@ -515,7 +515,7 @@ module.exports = async (req, res, next) => {
 			if (!minimalThreadsMap[t.board]) { return acc; }
 			if (!acc[t.board]) { acc[t.board] = { first: null, last: null }; }
 			const threadIndex = minimalThreadsMap[t.board].findIndex(p => p.postId === t.postId);
-			const threadPage = Math.max(1, Math.ceil((threadIndex+1)/10));
+			const threadPage = Math.max(1, Math.ceil((threadIndex + 1) / 10));
 			if (!acc[t.board].first || threadPage < acc[t.board].first) {
 				acc[t.board].first = threadPage;
 			}
