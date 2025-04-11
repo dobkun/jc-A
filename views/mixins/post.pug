@@ -115,11 +115,15 @@ mixin post(post, truncate, manage=false, globalmanage=false, ban=false, overboar
 							- const type = file.mimetype.split('/')[0]
 							if file.approved || manage || modview || globalmanage
 								span.post-file-info
+									-const unixtimestamp = `${post.u}${fileindex > 0 ? `-${fileindex}`:''}`
 									span
-										a.filename(href=`/file/${file.filename}` title=`Download ${file.originalFilename}` download=file.originalFilename) #{post.spoiler || file.spoiler ? __('Spoiler File') : file.originalFilename}
+										a.filename(href=`/file/${file.filename}` title=`${file.originalFilename}` download=file.originalFilename) #{post.spoiler || file.spoiler ? __('Spoiler File') : file.originalFilename}
 										|
 										|
-										a.filename(href=`/file/${file.filename}` title='Download Unix timestamp' download=`${post.u}${fileindex > 0 ? String.fromCharCode(97 + fileindex - 1) : ''}${file.extension}`) #{'U'}
+										a.filename(href=`/file/${file.filename}` title=`${unixtimestamp}${file.extension}` download=`${unixtimestamp}${file.extension}`) #{'U'}
+										|
+										|
+										a.filename(href=`/file/${file.filename}` title=`${unixtimestamp}_${file.originalFilename}` download=`${unixtimestamp}_${file.originalFilename}`) #{'A'}
 									br
 									if globalmanage && file.phash != null
 										span #{file.phash}
