@@ -71,7 +71,6 @@ class modMacroHandler {
 
 	change(e) {
 		let selectedValue = e.target.value;
-		this.reset();
 
 		switch (selectedValue) {
 			case 'clear':
@@ -85,54 +84,43 @@ class modMacroHandler {
 				break;
 			case 'ban':
 				this.set('global_ban', true);
-				this.set('ban_h', true);
-				this.set('preserve_post', true);
+				this.set('ban_q', true);
 				break;
 			case 'rule1':
 				this.set('delete_file', true);
 				this.set('global_ban', true);
-				this.set('ban_h', true);
+				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 1');
-				this.set('ban_duration', '10y');
-				this.set('preserve_post', true);
+				this.set('ban_duration', '100y');
 				this.set('untrust', true);
 				break;
 			case 'rule2':
 				this.set('delete_file', true);
 				this.set('global_ban', true);
-				this.set('ban_h', true);
+				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 2');
-				this.set('ban_duration', '1h');
-				this.set('preserve_post', true);
+				this.set('ban_duration', '1d');
 				this.set('untrust', true);
 				break;
 			case 'rule3':
+				this.set('delete_ip_global', true);
 				this.set('global_ban', true);
-				this.set('ban_h', true);
+				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 3');
-				this.set('ban_duration', '1d');
-				this.set('preserve_post', true);
+				this.set('ban_duration', '100y');
 				break;
 			case 'rule4':
+				this.set('delete_ip_global', true);
 				this.set('global_ban', true);
-				this.set('ban_h', true);
+				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 4');
 				this.set('ban_duration', '4h');
-				this.set('preserve_post', true);
 				break;
 			case 'rule5':
 				this.set('global_ban', true);
-				this.set('ban_h', true);
+				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 5');
 				this.set('ban_duration', '1y');
-				this.set('preserve_post', true);
-				break;
-			case 'banevasion':
-				this.set('global_ban', true);
-				this.set('ban_h', true);
-				this.set('ban_reason', 'ban evasion');
-				this.set('ban_duration', '1h');
-				this.set('preserve_post', true);
 				break;
 		}
 	}
