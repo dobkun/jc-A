@@ -87,13 +87,11 @@ class modMacroHandler {
 			case 'ban':
 				this.reset();
 				this.set('global_ban', true);
-				this.set('ban_q', true);
 				break;
 			case 'rule1':
 				this.reset();
 				this.set('delete_file', true);
 				this.set('global_ban', true);
-				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 1');
 				this.set('ban_duration', '100y');
 				this.set('untrust', true);
@@ -102,7 +100,6 @@ class modMacroHandler {
 				this.reset();
 				this.set('delete_file', true);
 				this.set('global_ban', true);
-				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 2');
 				this.set('ban_duration', '1d');
 				this.set('untrust', true);
@@ -111,7 +108,6 @@ class modMacroHandler {
 				this.reset();
 				this.set('delete_ip_global', true);
 				this.set('global_ban', true);
-				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 3');
 				this.set('ban_duration', '100y');
 				break;
@@ -119,14 +115,12 @@ class modMacroHandler {
 				this.reset();
 				this.set('delete_ip_global', true);
 				this.set('global_ban', true);
-				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 4');
 				this.set('ban_duration', '4h');
 				break;
 			case 'rule5':
 				this.reset();
 				this.set('global_ban', true);
-				this.set('ban_q', true);
 				this.set('ban_reason', 'rule 5');
 				this.set('ban_duration', '1y');
 				break;
