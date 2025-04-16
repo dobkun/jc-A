@@ -105,11 +105,6 @@ function recaptchaCallback(response) { // eslint-disable-line
 	recaptchaResponse = response;
 }
 
-let turnstileResponse = null;
-function turnstileCallback(response) { // eslint-disable-line
-	turnstileResponse = response;
-}
-
 let tegakiWidth = localStorage.getItem('tegakiwidth-setting');
 let tegakiHeight = localStorage.getItem('tegakiheight-setting');
 
@@ -131,7 +126,8 @@ class postFormHandler {
 		//get different element for diffeent captcha types
 		this.captchaField = form.querySelector('.captchafield')
 			|| form.querySelector('.g-recaptcha')
-			|| form.querySelector('.h-captcha');
+			|| form.querySelector('.h-captcha')
+			|| form.querySelector('.cf-turnstile');
 
 		//if tegaki button, attach the listener to open tegaki
 		this.tegakiButton = form.querySelector('.tegaki-button');
@@ -289,7 +285,7 @@ class postFormHandler {
 
 	async formSubmit(e) {
 		//get the captcha response if any recaptcha
-		const captchaResponse = recaptchaResponse || turnstileResponse;
+		const captchaResponse = recaptchaResponse;
 
 		//build the form data based on form enctype
 		let postData;
