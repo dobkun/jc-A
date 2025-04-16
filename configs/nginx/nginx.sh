@@ -23,6 +23,7 @@ if [ "$CLEARNET_DOMAIN" != "" ]; then
 	fi
 fi
 read -p "Should robots.txt disallow compliant crawlers? (y/n): " ROBOTS_TXT_DISALLOW
+read -p "Allow turnstile captcha in content-security policy? (y/n): " TURNSTILE_CAPTCHA
 read -p "Allow google captcha in content-security policy? (y/n): " GOOGLE_CAPTCHA
 read -p "Allow Hcaptcha in content-security policy? (y/n): " H_CAPTCHA
 read -p "Allow Yandex SmartCaptcha in content-security policy? (y/n): " Y_CAPTCHA
@@ -39,6 +40,7 @@ certbot https cert: $CERTBOT
 self-signed https cert: $SELFSIGNED
 no https cert: $NOHTTPS
 robots.txt disallow all: $ROBOTS_TXT_DISALLOW
+turnstile captcha: $TURNSTILE_CAPTCHA
 google captcha: $GOOGLE_CAPTCHA
 hcaptcha: $H_CAPTCHA
 yandex captcha: $Y_CAPTCHA
@@ -254,6 +256,13 @@ if [ "$NOHTTPS" == "y" ]; then
 	echo "Adjusting config snippets to support NOHTTPS mode..."
 	sudo sed -i "s/Forwarded-Proto https/Forwarded-Proto http/g" /etc/nginx/snippets/jschan_clearnet_routes.conf
 fi
+
+if [ "$TURNSTILE_CAPTCHA" == "y" ]; then
+	echo "Allowing turnstile in CSP..."
+	#add turnstile captcha CSP exceptions
+	sudo sed -i "s|script-src|script-src https://challenges.cloudflare.com |g" /etc/nginx/snippets/*
+	sudo sed -i "s|frame-src|frame-src https://challenges.cloudflare.com |g" /etc/nginx/snippets/*
+fi:want
 
 if [ "$GOOGLE_CAPTCHA" == "y" ]; then
 	echo "Allowing recaptcha in CSP..."
