@@ -136,7 +136,7 @@ class postFormHandler {
 		this.captchaField = form.querySelector('.captchafield')
 			|| form.querySelector('.g-recaptcha')
 			|| form.querySelector('.h-captcha')
-			|| form.querySelector('.cf-turnstile');
+			|| form.querySelector('#cf-turnstile-container');
 
 		//if tegaki button, attach the listener to open tegaki
 		this.tegakiButton = form.querySelector('.tegaki-button');
