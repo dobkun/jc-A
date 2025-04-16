@@ -381,11 +381,10 @@ class postFormHandler {
 
 			//request finished
 			if (xhr.readyState === 4) {
-
 				//if the google/hcaptcha/yandex was filled, reset it now
-				if (captchaResponse && grecaptcha) {
+				if (captchaResponse && typeof grecaptcha !== 'undefined') {
 					grecaptcha.reset();
-				} else if (captchaResponse && hcaptcha) {
+				} else if (captchaResponse && typeof hcaptcha !== 'undefined') {
 					hcaptcha.reset();
 				} else if (captchaResponse && window.smartCaptcha) {
 					window.smartCaptcha.reset();

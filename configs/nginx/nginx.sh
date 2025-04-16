@@ -262,7 +262,7 @@ if [ "$TURNSTILE_CAPTCHA" == "y" ]; then
 	#add turnstile captcha CSP exceptions
 	sudo sed -i "s|script-src|script-src https://challenges.cloudflare.com |g" /etc/nginx/snippets/*
 	sudo sed -i "s|frame-src|frame-src https://challenges.cloudflare.com |g" /etc/nginx/snippets/*
-fi:want
+fi
 
 if [ "$GOOGLE_CAPTCHA" == "y" ]; then
 	echo "Allowing recaptcha in CSP..."
