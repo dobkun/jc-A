@@ -1,16 +1,16 @@
 'use strict';
 
-const changeGlobalSettings = require(__dirname+'/../../models/forms/changeglobalsettings.js')
-	, dynamicResponse = require(__dirname+'/../../lib/misc/dynamic.js')
-	, themeHelper = require(__dirname+'/../../lib/misc/themes.js')
-	, config = require(__dirname+'/../../lib/misc/config.js')
-	, { Accounts } = require(__dirname+'/../../db/')
-	, { fontPaths } = require(__dirname+'/../../lib/misc/fonts.js')
-	, paramConverter = require(__dirname+'/../../lib/middleware/input/paramconverter.js')
-	, i18n = require(__dirname+'/../../lib/locale/locale.js')
-	, doTwoFactor = require(__dirname+'/../../lib/misc/dotwofactor.js')
+const changeGlobalSettings = require(__dirname + '/../../models/forms/changeglobalsettings.js')
+	, dynamicResponse = require(__dirname + '/../../lib/misc/dynamic.js')
+	, themeHelper = require(__dirname + '/../../lib/misc/themes.js')
+	, config = require(__dirname + '/../../lib/misc/config.js')
+	, { Accounts } = require(__dirname + '/../../db/')
+	, { fontPaths } = require(__dirname + '/../../lib/misc/fonts.js')
+	, paramConverter = require(__dirname + '/../../lib/middleware/input/paramconverter.js')
+	, i18n = require(__dirname + '/../../lib/locale/locale.js')
+	, doTwoFactor = require(__dirname + '/../../lib/misc/dotwofactor.js')
 	, { checkSchema, lengthBody, numberBody, minmaxBody, numberBodyVariable,
-		inArrayBody, existsBody } = require(__dirname+'/../../lib/input/schema.js');
+		inArrayBody, existsBody } = require(__dirname + '/../../lib/input/schema.js');
 
 module.exports = {
 
@@ -19,7 +19,7 @@ module.exports = {
 		trimFields: ['twofactor', 'captcha_options_grid_question', 'captcha_options_grid_trues', 'captcha_options_grid_falses', 'captcha_options_font', 'allowed_hosts', 'dnsbl_blacklists', 'other_mime_types',
 			'highlight_options_language_subset', 'global_limits_custom_css_filters', 'board_defaults_filters', 'filters', 'archive_links', 'ethereum_links', 'reverse_links', 'language', 'board_defaults_language'],
 		numberFields: ['inactive_account_action', 'abandoned_board_action', 'auth_level', 'captcha_options_text_wave', 'captcha_options_text_paint', 'captcha_options_text_noise',
-			'captcha_options_grid_noise', 'captcha_options_grid_edge', 'captcha_options_generate_limit', 'captcha_options_grid_size',  'captcha_options_grid_image_size',
+			'captcha_options_grid_noise', 'captcha_options_grid_edge', 'captcha_options_generate_limit', 'captcha_options_grid_size', 'captcha_options_grid_image_size',
 			'captcha_options_num_distorts_min', 'captcha_options_num_distorts_max', 'captcha_options_distortion', 'captcha_options_grid_icon_y_offset', 'flood_timers_same_content_same_ip', 'flood_timers_same_content_any_ip',
 			'flood_timers_any_content_same_ip', 'block_bypass_expire_after_uses', 'rate_limit_cost_captcha', 'rate_limit_cost_board_settings', 'rate_limit_cost_edit_post',
 			'overboard_limit', 'hot_threads_limit', 'hot_threads_threshold', 'overboard_catalog_limit', 'lock_wait', 'prune_modlogs', 'prune_ips', 'thumb_size', 'video_thumb_percentage', 'quote_limit', 'preview_replies',
@@ -47,59 +47,71 @@ module.exports = {
 
 		const errors = await checkSchema([
 			{ result: existsBody(req.body.twofactor) ? lengthBody(req.body.twofactor, 0, 6) : false, expected: false, error: __('Invalid 2FA code') },
-			{ result: async () => {
-				if (res.locals.user.twofactor && forceActionTwofactor) {
-					//2fA (TOTP) validation
-					try {
-						const twofactorSecret = (await Accounts.findOne(req.session.user)).twofactor;
-						const delta = await doTwoFactor(res.locals.user.username, twofactorSecret, req.body.twofactor || '');
-						if (delta === null) {
+			{
+				result: async () => {
+					if (res.locals.user.twofactor && forceActionTwofactor) {
+						//2fA (TOTP) validation
+						try {
+							const twofactorSecret = (await Accounts.findOne(req.session.user)).twofactor;
+							const delta = await doTwoFactor(res.locals.user.username, twofactorSecret, req.body.twofactor || '');
+							if (delta === null) {
+								return false;
+							}
+							return true;
+						} catch (err) {
+							console.warn(err);
 							return false;
 						}
-						return true;
-					} catch (err) {
-						console.warn(err);
-						return false;
+					} else {
+						return true; //Force twofactor not enabled
 					}
-				} else {
-					return true; //Force twofactor not enabled
-				}
-			}, expected: true, error: __('Invalid 2FA Code') },
-			{ result: () => {
-				if (req.body.thumb_extension) {
-					return /\.[a-z0-9]+/i.test(req.body.thumb_extension);
-				}
-				return false;
-			}, expected: true, error: __('Thumb extension must be like .xxx') },
-			{ result: () => {
-				if (req.body.other_mime_types) {
-					return req.body.other_mime_types
-						.split('\n')
-						.some(m => {
-							return !m.match(/\w+\/\w+/i);
-						});
-				}
-				return false;
-			}, expected: false, error: __('Extra mime types must be like type/subtype') },
-			{ result: () => {
-				if (req.body.archive_links) {
-					/* eslint-disable no-useless-escape */
-					return /https?\:\/\/[^\s<>\[\]{}|\\^]+%s[^\s<>\[\]{}|\\^]*/i.test(req.body.archive_links);
-				}
-				return false;
-			}, expected: true, error: __('Invalid archive links URL format, must be a link containing %s where the url param belongs.') },
-			{ result: () => {
-				if (req.body.reverse_links) {
-					return /https?\:\/\/[^\s<>\[\]{}|\\^]+%s[^\s<>\[\]{}|\\^]*/i.test(req.body.reverse_links);
-				}
-				return false;
-			}, expected: true, error: __('Invalid reverse image search links URL format, must be a link containing %s where the url param belongs.') },
-			{ result: () => {
-				if (req.body.ethereum_links) {
-					return /https?\:\/\/[^\s<>\[\]{}|\\^]+%s[^\s<>\[\]{}|\\^]*/i.test(req.body.ethereum_links);
-				}
-				return false;
-			}, expected: true, error: __('Invalid ethereum links URL format, must be a link containing %s where the url param belongs.') },
+				}, expected: true, error: __('Invalid 2FA Code')
+			},
+			{
+				result: () => {
+					if (req.body.thumb_extension) {
+						return /\.[a-z0-9]+/i.test(req.body.thumb_extension);
+					}
+					return false;
+				}, expected: true, error: __('Thumb extension must be like .xxx')
+			},
+			{
+				result: () => {
+					if (req.body.other_mime_types) {
+						return req.body.other_mime_types
+							.split('\n')
+							.some(m => {
+								return !m.match(/\w+\/\w+/i);
+							});
+					}
+					return false;
+				}, expected: false, error: __('Extra mime types must be like type/subtype')
+			},
+			{
+				result: () => {
+					if (req.body.archive_links) {
+						/* eslint-disable no-useless-escape */
+						return /https?\:\/\/[^\s<>\[\]{}|\\^]+%s[^\s<>\[\]{}|\\^]*/i.test(req.body.archive_links);
+					}
+					return false;
+				}, expected: true, error: __('Invalid archive links URL format, must be a link containing %s where the url param belongs.')
+			},
+			{
+				result: () => {
+					if (req.body.reverse_links) {
+						return /https?\:\/\/[^\s<>\[\]{}|\\^]+%s[^\s<>\[\]{}|\\^]*/i.test(req.body.reverse_links);
+					}
+					return false;
+				}, expected: true, error: __('Invalid reverse image search links URL format, must be a link containing %s where the url param belongs.')
+			},
+			{
+				result: () => {
+					if (req.body.ethereum_links) {
+						return /https?\:\/\/[^\s<>\[\]{}|\\^]+%s[^\s<>\[\]{}|\\^]*/i.test(req.body.ethereum_links);
+					}
+					return false;
+				}, expected: true, error: __('Invalid ethereum links URL format, must be a link containing %s where the url param belongs.')
+			},
 			{ result: existsBody(req.body.referrer_check) ? lengthBody(req.body.allowed_hosts, 1) : false, expected: false, error: __('Please enter at least one allowed host in the "Allowed Hosts" field when the "Referer Check" option is selected.') },
 			{ result: numberBody(req.body.inactive_account_time), expected: true, error: __('Invalid inactive account time') },
 			{ result: numberBody(req.body.inactive_account_action, 0, 2), expected: true, error: __('Inactive account action must be a number from 0-2') },
@@ -111,12 +123,14 @@ module.exports = {
 			{ result: lengthBody(req.body.ip_header, 0, 100), expected: false, error: __('IP header length must not exceed 100 characters') },
 			{ result: lengthBody(req.body.meta_site_name, 0, 100), expected: false, error: __('Meta site name must not exceed 100 characters') },
 			{ result: lengthBody(req.body.meta_url, 0, 100), expected: false, error: __('Meta url must not exceed 100 characters') },
-			{ result: existsBody(req.body.enable_webring)
-				? (lengthBody(req.body.meta_site_name, 1, 100) || lengthBody(req.body.meta_url, 1, 100))
-				: false, expected: false, error: __('Meta url and site name must be set to enable webring') },
+			{
+				result: existsBody(req.body.enable_webring)
+					? (lengthBody(req.body.meta_site_name, 1, 100) || lengthBody(req.body.meta_url, 1, 100))
+					: false, expected: false, error: __('Meta url and site name must be set to enable webring')
+			},
 			{ result: inArrayBody(req.body.language, i18n.getLocales()), expected: true, error: __('Invalid language') },
 			{ result: inArrayBody(req.body.board_defaults_language, i18n.getLocales()), expected: true, error: __('Invalid language') },
-			{ result: inArrayBody(req.body.captcha_options_type, ['grid', 'grid2', 'text', 'google', 'hcaptcha', 'yandex']), expected: true, error: __('Invalid captcha options type') },
+			{ result: inArrayBody(req.body.captcha_options_type, ['grid', 'grid2', 'text', 'google', 'hcaptcha', 'yandex', 'turnstile']), expected: true, error: __('Invalid captcha options type') },
 			{ result: numberBody(req.body.captcha_options_generate_limit, 1), expected: true, error: __('Captcha options generate limit must be a number > 0') },
 			{ result: numberBody(req.body.captcha_options_grid_size, 2, 6), expected: true, error: __('Captcha options grid size must be a number from 2-6') },
 			{ result: numberBody(req.body.captcha_options_grid_image_size, 50, 500), expected: true, error: __('Captcha options grid image size must be a number from 50-500') },
