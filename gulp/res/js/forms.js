@@ -1,4 +1,4 @@
-/* globals __ __n modal Tegaki grecaptcha hcaptcha captchaController appendLocalStorageArray socket isThread setLocalStorage forceUpdate captchaController uploaditem ThumbmarkJS detectIncognito */
+/* globals __ __n modal Tegaki turnstile grecaptcha hcaptcha captchaController appendLocalStorageArray socket isThread setLocalStorage forceUpdate captchaController uploaditem ThumbmarkJS detectIncognito */
 async function checkWebSocket(url) {
 	return new Promise((resolve) => {
 		try {
@@ -107,6 +107,15 @@ function recaptchaCallback(response) { // eslint-disable-line
 
 let tegakiWidth = localStorage.getItem('tegakiwidth-setting');
 let tegakiHeight = localStorage.getItem('tegakiheight-setting');
+
+let turnstileWidgetId = null;
+function waitForTurnstile(callback) {
+	if (typeof turnstile !== 'undefined') {
+		callback();
+	} else {
+		setTimeout(() => waitForTurnstile(callback), 50);
+	}
+}
 
 class postFormHandler {
 
@@ -384,6 +393,8 @@ class postFormHandler {
 					hcaptcha.reset();
 				} else if (captchaResponse && window.smartCaptcha) {
 					window.smartCaptcha.reset();
+				} else if (captchaResponse && typeof turnstile !== 'undefined' && turnstileWidgetId != null) {
+					turnstile.reset(turnstileWidgetId);
 				}
 
 				//remove captcha if server says it is no longer enabled	(submitting one when not needed doesnt cause any problem)
@@ -727,6 +738,19 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
+	const turnstileContainer = document.querySelector('#cf-turnstile-container');
+	if (turnstileContainer) {
+		waitForTurnstile(() => {
+			turnstileWidgetId = turnstile.render('#cf-turnstile-container', {
+				sitekey: turnstileContainer.dataset.sitekey,
+				callback: recaptchaCallback,
+				theme: 'dark',
+			});
+		});
+	}
+	if (typeof turnstile !== 'undefined' && turnstileWidgetId != null) {
+		turnstile.reset(turnstileWidgetId);
+	}
 });
 
 window.addEventListener('settingsReady', () => {
