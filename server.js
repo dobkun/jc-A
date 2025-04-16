@@ -4,21 +4,21 @@ process
 	.on('uncaughtException', console.error)
 	.on('unhandledRejection', console.error);
 
-const config = require(__dirname+'/lib/misc/config.js')
+const config = require(__dirname + '/lib/misc/config.js')
 	, express = require('express')
 	, path = require('path')
 	, app = express()
 	, server = require('http').createServer(app)
 	, cookieParser = require('cookie-parser')
-	, { port, cookieSecret, debugLogs, google, hcaptcha, yandex } = require(__dirname+'/configs/secrets.js')
-	, Mongo = require(__dirname+'/db/db.js')
-	, dynamicResponse = require(__dirname+'/lib/misc/dynamic.js')
-	, commit = require(__dirname+'/lib/misc/commit.js')
-	, { version } = require(__dirname+'/package.json')
-	, formatSize = require(__dirname+'/lib/converter/formatsize.js')
+	, { port, cookieSecret, debugLogs, turnstile, google, hcaptcha, yandex } = require(__dirname + '/configs/secrets.js')
+	, Mongo = require(__dirname + '/db/db.js')
+	, dynamicResponse = require(__dirname + '/lib/misc/dynamic.js')
+	, commit = require(__dirname + '/lib/misc/commit.js')
+	, { version } = require(__dirname + '/package.json')
+	, formatSize = require(__dirname + '/lib/converter/formatsize.js')
 	, CachePugTemplates = require('cache-pug-templates')
-	, { Permissions } = require(__dirname+'/lib/permission/permissions.js')
-	, i18n = require(__dirname+'/lib/locale/locale.js');
+	, { Permissions } = require(__dirname + '/lib/permission/permissions.js')
+	, i18n = require(__dirname + '/lib/locale/locale.js');
 
 (async () => {
 
@@ -35,10 +35,10 @@ const config = require(__dirname+'/lib/misc/config.js')
 
 	// connect to redis
 	debugLogs && console.log('CONNECTING TO REDIS');
-	const redis = require(__dirname+'/lib/redis/redis.js');
+	const redis = require(__dirname + '/lib/redis/redis.js');
 
 	// load roles early
-	const roleManager = require(__dirname+'/lib/permission/rolemanager.js');
+	const roleManager = require(__dirname + '/lib/permission/rolemanager.js');
 	await roleManager.load();
 
 	// disable useless express header
@@ -46,15 +46,15 @@ const config = require(__dirname+'/lib/misc/config.js')
 	//query strings
 	app.set('query parser', 'simple');
 	// parse forms
-	app.use(express.urlencoded({extended: false}));
+	app.use(express.urlencoded({ extended: false }));
 	// parse cookies
 	app.use(cookieParser(cookieSecret));
 
 	// session store
-	const sessionMiddleware = require(__dirname+'/lib/middleware/permission/usesession.js');
+	const sessionMiddleware = require(__dirname + '/lib/middleware/permission/usesession.js');
 
 	// connect socketio
-	const Socketio = require(__dirname+'/lib/misc/socketio.js');
+	const Socketio = require(__dirname + '/lib/misc/socketio.js');
 	debugLogs && console.log('STARTING WEBSOCKET');
 	Socketio.connect(server, sessionMiddleware);
 
@@ -86,6 +86,7 @@ const config = require(__dirname+'/lib/misc/config.js')
 		app.locals.version = version;
 		app.locals.meta = meta;
 		app.locals.postFilesSize = formatSize(globalLimits.postFilesSize.max);
+		app.locals.turnstileSiteKey = turnstile ? turnstile.siteKey : '';
 		app.locals.googleRecaptchaSiteKey = google ? google.siteKey : '';
 		app.locals.hcaptchaSiteKey = hcaptcha ? hcaptcha.siteKey : '';
 		app.locals.yandexSiteKey = yandex ? yandex.siteKey : '';
@@ -100,22 +101,22 @@ const config = require(__dirname+'/lib/misc/config.js')
 
 	// routes
 	if (!production) {
-		app.use(express.static(__dirname+'/static', { redirect: false }));
-		app.use(express.static(__dirname+'/static/html', { redirect: false }));
-		app.use(express.static(__dirname+'/static/json', { redirect: false }));
+		app.use(express.static(__dirname + '/static', { redirect: false }));
+		app.use(express.static(__dirname + '/static/html', { redirect: false }));
+		app.use(express.static(__dirname + '/static/json', { redirect: false }));
 	}
 
 	//localisation
-	const { setGlobalLanguage } = require(__dirname+'/lib/middleware/locale/locale.js');
+	const { setGlobalLanguage } = require(__dirname + '/lib/middleware/locale/locale.js');
 	app.use(i18n.init);
 	app.use(setGlobalLanguage);
 
 	//referer check middleware
-	const referrerCheck = require(__dirname+'/lib/middleware/misc/referrercheck.js');
+	const referrerCheck = require(__dirname + '/lib/middleware/misc/referrercheck.js');
 	app.use(referrerCheck);
 
-	app.use('/forms', require(__dirname+'/controllers/forms.js'));
-	app.use('/', require(__dirname+'/controllers/pages.js'));
+	app.use('/forms', require(__dirname + '/controllers/forms.js'));
+	app.use('/', require(__dirname + '/controllers/pages.js'));
 
 	//404 catchall
 	app.get('*', (req, res) => {
@@ -129,7 +130,7 @@ const config = require(__dirname+'/lib/misc/config.js')
 		let errMessage = 'Internal Server Error';
 		if (err.code === 'EBADCSRFTOKEN') {
 			errMessage = 'Invalid CSRF token';
-			errStatus= 403;
+			errStatus = 403;
 		}
 		if (err.type != null) {
 			//body-parser errors
@@ -154,7 +155,7 @@ const config = require(__dirname+'/lib/misc/config.js')
 					break;
 			}
 		}
-		if (errStatus === 500 && errMessage ===  'Internal Server Error') {
+		if (errStatus === 500 && errMessage === 'Internal Server Error') {
 			//no specific/friendly error, probably something worth logging
 			console.error(err);
 		}

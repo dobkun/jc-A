@@ -318,6 +318,7 @@ ul.tabs.group
 					option(value='google', selected=settings.captchaOptions.type === 'google') #{__('Google')}
 					option(value='hcaptcha', selected=settings.captchaOptions.type === 'hcaptcha') #{__('Hcaptcha')}
 					option(value='yandex', selected=settings.captchaOptions.type === 'yandex') #{__('Yandex')}
+					option(value='turnstile', selected=settings.captchaOptions.type === 'turnstile') #{__('Turnstile')}
 			.row
 				.label #{__('Generate Limit')}
 				input(type='number' name='captcha_options_generate_limit' value=settings.captchaOptions.generateLimit)

@@ -4,7 +4,7 @@ const config = require(__dirname + '/lib/misc/config.js')
 	, { Binary } = require('mongodb')
 	, Permission = require(__dirname + '/lib/permission/permission.js')
 	, { Permissions } = require(__dirname + '/lib/permission/permissions.js')
-	, { hcaptcha, google, yandex } = require(__dirname + '/configs/secrets.js')
+	, { turnstile, hcaptcha, google, yandex } = require(__dirname + '/configs/secrets.js')
 	, gulp = require('gulp')
 	//	, pugRuntime = require('pug-runtime/build')
 	, fs = require('fs-extra')
@@ -314,6 +314,7 @@ async function css() {
 			, captchaHeight
 			, captchaWidth;
 		switch (config.get.captchaOptions.type) {
+			case 'turnstile':
 			case 'google':
 			case 'hcaptcha':
 				bypassHeight = 500;
@@ -453,6 +454,7 @@ async function custompages() {
 			defaultTheme: config.get.boardDefaults.theme,
 			defaultCodeTheme: config.get.boardDefaults.codeTheme,
 			postFilesSize: formatSize(config.get.globalLimits.postFilesSize.max),
+			turnstileSiteKey: turnstile ? turnstile.siteKey : '',
 			googleRecaptchaSiteKey: google ? google.siteKey : '',
 			hcaptchaSiteKey: hcaptcha ? hcaptcha.siteKey : '',
 			yandexSiteKey: yandex ? yandex.siteKey : '',
