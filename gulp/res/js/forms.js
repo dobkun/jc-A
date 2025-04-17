@@ -501,7 +501,7 @@ class postFormHandler {
 					//something is completely wrong, usually no connection or server down
 					doModal({
 						'title': 'Error',
-						'message': 'Something broke'
+						'message': 'Your post has been dropped, you may need to complete the captcha.'
 					});
 				}
 
@@ -517,7 +517,7 @@ class postFormHandler {
 			console.error(err);
 			doModal({
 				'title': 'Error',
-				'message': 'Something broke'
+				'message': 'Your post has been dropped, you may need to complete the captcha.'
 			});
 			if (this.submit) {
 				this.submit.disabled = false;
