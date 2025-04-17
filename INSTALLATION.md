@@ -383,6 +383,10 @@ You will need to match the number of servers to however many chan processes you 
 
 3. pm2 restart ecosystem.config.js --env production && sudo systemctl restart nginx
 
+#### Cloudflare managed challange
+
+Configure WAF rules to block non GET requests. Add turnstile captcha and set it up to set managed challange cookie.
+
 #### Customisation
 
 Customisation is pretty easy. As long as you format whatever you are customising properly e.g. pug templates, css, etc and have correct syntax for javascript files, the build system will handle the rest for you. Here are some things you can do:
