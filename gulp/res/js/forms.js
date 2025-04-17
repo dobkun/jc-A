@@ -501,7 +501,7 @@ class postFormHandler {
 					//something is completely wrong, usually no connection or server down
 					doModal({
 						'title': 'Error',
-						'message': 'Your post has been dropped, you may need to complete the captcha.'
+						'message': 'Your post has been dropped, you may need to complete the <a href="/managed-challenge.html" target="_blank" rel="noopener noreferrer">captcha</a>. If issue persists see <a href="/faq.html" target="_blank" rel="noopener noreferrer">faq</a> to email site admin.'
 					});
 				}
 
@@ -517,7 +517,7 @@ class postFormHandler {
 			console.error(err);
 			doModal({
 				'title': 'Error',
-				'message': 'Your post has been dropped, you may need to complete the captcha.'
+				'message': 'Your post has been dropped, you may need to complete the <a href="/managed-challenge.html" target="_blank" rel="noopener noreferrer">captcha</a>. If issue persists see <a href="/faq.html" target="_blank" rel="noopener noreferrer">faq</a> to email site admin.'
 			});
 			if (this.submit) {
 				this.submit.disabled = false;

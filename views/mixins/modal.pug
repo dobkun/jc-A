@@ -14,12 +14,12 @@ mixin modal(data)
 			.row
 				ul.nomarks
 					if data.message
-						li #{data.message}
+						li!= data.message
 					if data.error
 						li #{data.error}
 					if data.messages
 						each msg in data.messages
-							li #{msg}
+							li!= msg
 					if data.errors
 						each error in data.errors
 							li #{error}

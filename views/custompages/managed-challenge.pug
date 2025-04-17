@@ -1,0 +1,9 @@
+extends ../layout.pug
+
+block head
+	title Managed Challenge
+
+block content
+	h1.board-title Managed Challenge
+	summary.pv-5 #{__('Captcha')}
+	include ../includes/captcha.pug
