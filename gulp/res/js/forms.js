@@ -108,15 +108,6 @@ function recaptchaCallback(response) { // eslint-disable-line
 let tegakiWidth = localStorage.getItem('tegakiwidth-setting');
 let tegakiHeight = localStorage.getItem('tegakiheight-setting');
 
-let turnstileWidgetId = null;
-function waitForTurnstile(callback) {
-	if (typeof turnstile !== 'undefined') {
-		callback();
-	} else {
-		setTimeout(() => waitForTurnstile(callback), 50);
-	}
-}
-
 class postFormHandler {
 
 	constructor(form) {
@@ -393,8 +384,8 @@ class postFormHandler {
 					hcaptcha.reset();
 				} else if (captchaResponse && window.smartCaptcha) {
 					window.smartCaptcha.reset();
-				} else if (captchaResponse && typeof turnstile !== 'undefined' && turnstileWidgetId != null) {
-					turnstile.reset(turnstileWidgetId);
+				} else if (captchaResponse && typeof turnstile !== 'undefined') {
+					turnstile.reset('#cf-turnstile-widget');
 				}
 
 				//remove captcha if server says it is no longer enabled	(submitting one when not needed doesnt cause any problem)
@@ -737,20 +728,6 @@ window.addEventListener('DOMContentLoaded', () => {
 			e.detail.post.previousSibling.scrollIntoView();
 		}
 	});
-
-	const turnstileContainer = document.querySelector('#cf-turnstile-container');
-	if (turnstileContainer) {
-		waitForTurnstile(() => {
-			turnstileWidgetId = turnstile.render('#cf-turnstile-container', {
-				sitekey: turnstileContainer.dataset.sitekey,
-				callback: recaptchaCallback,
-				theme: 'dark',
-			});
-		});
-	}
-	if (typeof turnstile !== 'undefined' && turnstileWidgetId != null) {
-		turnstile.reset(turnstileWidgetId);
-	}
 });
 
 window.addEventListener('settingsReady', () => {

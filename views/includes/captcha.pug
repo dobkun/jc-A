@@ -1,6 +1,13 @@
 case captchaOptions.type
 	when 'turnstile'
-		div(id="cf-turnstile-container" data-sitekey=`${turnstileSiteKey}`)
+		div(
+			id='cf-turnstile-widget'
+			class='cf-turnstile'
+			data-sitekey=`${turnstileSiteKey}`
+			data-theme='dark'
+			data-callback='recaptchaCallback'
+			data-refresh-expired='manual'
+			data-size='flexible')
 		noscript #{__('Please enable JavaScript to solve the captcha.')}
 	when 'google'
 		div(class='g-recaptcha' data-sitekey=`${googleRecaptchaSiteKey}` data-theme='dark' data-size='compact' data-callback='recaptchaCallback')
