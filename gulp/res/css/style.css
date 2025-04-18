@@ -799,7 +799,9 @@ td {
 	margin: 5px;
 	padding: 0 15px;
 	/*list-style: none;*/
-	word-break: break-all;
+	/* word-break: break-all; */
+	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
 .web3-signature,
