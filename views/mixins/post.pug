@@ -123,7 +123,7 @@ mixin post(post, truncate, manage=false, globalmanage=false, ban=false, overboar
 										a.filename(href=`/file/${file.filename}` title=`${unixtimestamp}${file.extension}` download=`${unixtimestamp}${file.extension}`) #{'U'}
 										|
 										|
-										a.filename(href=`/file/${file.filename}` title=`${unixtimestamp}_${file.originalFilename}` download=`${unixtimestamp}_${file.originalFilename}`) #{'A'}
+										a.filename(href=`/file/${file.filename}` title=`${unixtimestamp} ${file.originalFilename}` download=`${unixtimestamp} ${file.originalFilename}`) #{'A'}
 									br
 									if globalmanage && file.phash != null
 										span #{file.phash}
