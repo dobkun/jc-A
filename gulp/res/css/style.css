@@ -129,6 +129,7 @@ pre {
 	line-height: 48px;
 	width: auto;
 	vertical-align: top;
+	margin: 0px 5px;
 }
 
 @media (max-width: 600px) {
