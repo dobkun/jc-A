@@ -1,9 +1,9 @@
 unless minimal
 	nav.navbar
 		a.nav-item(href='/index.html')
-			img(src='/file/home.png' alt='Home')
+			img(src='/file/nigerihome.png' alt='Home')
 		a.nav-item(href='/boards.html')
-			img(src='/file/boards.png' alt='Boards')
+			img(src='/file/desuboards.png' alt='Boards')
 		if boardsList && boardsList.length > 0
 			span.nav-item
 				| #{'[ '}
@@ -13,13 +13,13 @@ unless minimal
 						|  / 
 				| #{' ]'}
 		a.nav-item(href='/overboard.html')
-			img(src='/file/overboard.png' alt='Overboard')
+			img(src='/file/bullyoverboard.png' alt='Overboard')
 		a.nav-item(href='/pages.html')
-			img(src='/file/pages.png' alt='Pages')
+			img(src='/file/arospages.png' alt='Pages')
 		a.nav-item(href='/account.html')
-			img(src='/file/account.png' alt='Account')
+			img(src='/file/oliviaaccount.png' alt='Account')
 		if !modview && board
 			a.nav-item(href=`/${board._id}/manage/${managePage || 'index.html'}`)
-				img(src='/file/manage.png' alt='Manage')
+				img(src='/file/tiredmanage.png' alt='Manage')
 		.nav-item.right#settings
-			img(src='/file/settings.png' alt='Settings')
+			img(src='/file/possumsettings.png' alt='Settings')
