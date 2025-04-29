@@ -7,7 +7,7 @@ const { createHash, randomBytes } = require('crypto')
 	, uploadDirectory = require(__dirname + '/../../lib/file/uploaddirectory.js')
 	, Mongo = require(__dirname + '/../../db/db.js')
 	, Socketio = require(__dirname + '/../../lib/misc/socketio.js')
-	, { TempDataCollection, Stats, Posts, Boards, Files, Filters } = require(__dirname + '/../../db/')
+	, { TrustedIps, TempDataCollection, Stats, Posts, Boards, Files, Filters } = require(__dirname + '/../../db/')
 	, cache = require(__dirname + '/../../lib/redis/redis.js')
 	, nameHandler = require(__dirname + '/../../lib/post/name.js')
 	, getFilterStrings = require(__dirname + '/../../lib/post/getfilterstrings.js')
@@ -449,7 +449,8 @@ module.exports = async (req, res) => {
 	//
 	// File approval
 	//
-	const bypassFileApproval = !requireFileApproval || res.locals.permissions.hasAny(Permissions.BYPASS_FILE_APPROVAL);
+	const isTrustedIp = await TrustedIps.exists(res.locals.ip);
+	const bypassFileApproval = !requireFileApproval || res.locals.permissions.hasAny(Permissions.BYPASS_FILE_APPROVAL) || isTrustedIp;
 
 	if (files.length > 0) {
 		for (let i = 0; i < files.length; i++) {

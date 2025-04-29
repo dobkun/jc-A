@@ -2,6 +2,7 @@
 
 module.exports = {
 
+	TrustedIps: require(__dirname + '/trustedips.js'),
 	TempDataCollection: require(__dirname + '/tempdatacollection.js'),
 	Assets: require(__dirname + '/assets.js'),
 	Posts: require(__dirname + '/posts.js'),

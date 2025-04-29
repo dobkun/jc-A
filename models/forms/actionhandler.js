@@ -1,6 +1,6 @@
 'use strict';
 
-const { Posts, Boards, Modlogs } = require(__dirname + '/../../db/')
+const { TrustedIps, Posts, Boards, Modlogs } = require(__dirname + '/../../db/')
 	, Mongo = require(__dirname + '/../../db/db.js')
 	, untrustPoster = require(__dirname + '/untrustposter.js')
 	, banPoster = require(__dirname + '/banposter.js')
@@ -90,8 +90,15 @@ module.exports = async (req, res, next) => {
 		}
 	}
 
+	// handle trust ip
+	if (req.body.trust_ip) {
+		const ip = res.locals.posts[0].ip;
+		await TrustedIps.insert(ip);
+		messages.push('Trusted IP.');
+	}
+
 	// handle trust
-	if (res.locals.board && req.body.untrust) {
+	if (req.body.untrust) {
 		const { message } = await untrustPoster(req, res, next);
 		modlogActions.push(ModlogActions.UNTRUST_USER);
 		messages.push(message);

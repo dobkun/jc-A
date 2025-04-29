@@ -10,6 +10,12 @@ details.toggle-label#actionform
 			input.post-check(type='checkbox', name='delete_file' value='1')
 			| #{__('Delete Files')}
 		label
+			input.post-check(type='checkbox', name='trust_ip' value='1')
+			| #{__('Trust IP')}
+		label
+			input.post-check(type='checkbox', name='untrust', value='1')
+			| #{__('Untrust Users')}
+		label
 			input.post-check(type='checkbox', name='approve' value='1')
 			| #{__('Approve Files')}
 		label
