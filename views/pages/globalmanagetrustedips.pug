@@ -1,0 +1,22 @@
+extends ../layout.pug
+include ../mixins/globalmanagenav.pug
+
+block head
+	title #{__('Trusted IPs')}
+
+block content
+	h1.board-title #{__('Global Management')}
+	br
+	+globalmanagenav('trustedips')
+	hr(size=1)
+	h4.no-m-p #{__('Trusted IPs')}:
+	if trustedips && trustedips.length > 0
+		.table-container.flex-left.mv-5.text-center
+			table
+				tr
+					th #{__('IP')}
+				for ip in trustedips
+					tr 
+						td #{viewRawIp ? ip.raw : ip.cloak}
+	else
+		p #{__('No results')}

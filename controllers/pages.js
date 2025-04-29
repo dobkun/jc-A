@@ -20,7 +20,7 @@ const express = require('express')
 	//page models
 	, { manageRecent, manageReports, manageSettings, manageBans, editCustomPage,
 		manageBoard, manageThread, manageLogs, manageCatalog, editPost } = require(__dirname + '/../models/pages/manage/')
-	, { globalManageAssets, globalManageCustomPages, globalManageTrusted, globalManageApproval, globalManageSettings, globalManageReports, globalManageBans, globalManageBoards, globalManageFilters, globalEditFilter, editNews, editAccount, editRole,
+	, { globalManageTrustedIps, globalManageAssets, globalManageCustomPages, globalManageTrusted, globalManageApproval, globalManageSettings, globalManageReports, globalManageBans, globalManageBoards, globalManageFilters, globalEditFilter, editNews, editAccount, editRole,
 		globalManageRecent, globalManageAccounts, globalManageNews, globalManageLogs, globalManageRoles } = require(__dirname + '/../models/pages/globalmanage/')
 	, { bans, banned, changePassword, blockBypass, home, register, login, create, myPermissions, sessions, setupTwoFactor,
 		board, catalog, banners, pages, boardSettings, globalSettings, randombanner, randomboardad, news, captchaPage, overboard, overboardCatalog,
@@ -126,6 +126,8 @@ router.get('/globalmanage/editrole/:roleid([a-f0-9]{24}).html', useSession, sess
 	hasPerms.one(Permissions.MANAGE_ROLES), csrf, roleParamConverter, editRole);
 router.get('/globalmanage/trusted.html', useSession, sessionRefresh, isLoggedIn, calcPerms,
 	hasPerms.one(Permissions.MANAGE_TRUSTED), csrf, globalManageTrusted);
+router.get('/globalmanage/trustedips.html', useSession, sessionRefresh, isLoggedIn, calcPerms,
+	hasPerms.one(Permissions.MANAGE_TRUSTED), csrf, globalManageTrustedIps);
 
 //captcha
 router.get('/captcha', geoIp, processIp, captcha); //get captcha image and cookie

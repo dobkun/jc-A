@@ -44,5 +44,6 @@ mixin globalmanagenav(selected, upLevel)
 		if permissions.get(Permissions.MANAGE_TRUSTED)
 			|  
 			a(href=`${upLevel ? '../' : ''}trusted.html` class=(selected === 'trusted' ? 'bold' : '')) [#{__('Trusted')}]
-
-
+		if permissions.get(Permissions.MANAGE_TRUSTED)
+			|  
+			a(href=`${upLevel ? '../' : ''}trustedips.html` class=(selected === 'trustedips' ? 'bold' : '')) [#{__('Trusted IPs')}]

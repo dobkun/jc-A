@@ -104,6 +104,10 @@ block content
 					|
 					|
 					a(href=`/globalmanage/trusted.html`) #{__('Trusted')}
+				if permissions.get(Permissions.MANAGE_TRUSTED)
+					|
+					|
+					a(href=`/globalmanage/trustedips.html`) #{__('Trusted IPs')}
 		hr(size=1)
 		h4.no-m-p #{__('Board Management')}:
 		ul

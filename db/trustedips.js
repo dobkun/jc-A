@@ -19,4 +19,8 @@ module.exports = {
 		const count = await db.countDocuments({ 'ip.raw': ip.raw }, { limit: 1 });
 		return count > 0;
 	},
+	getAll: async () => {
+		const docs = await db.find().toArray();
+		return docs.map(doc => doc.ip);
+	},
 };
