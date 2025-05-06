@@ -583,13 +583,6 @@ const extraLocals = ${JSON.stringify({ meta: config.get.meta, reverseImageLinksU
 		.pipe(gulp.dest(paths.scripts.dest));
 
 	gulp.src([
-		__dirname + '/node_modules/@thumbmarkjs/thumbmarkjs/dist/thumbmark.umd.js',
-	])
-		.pipe(concat('secret.js'))
-		.pipe(javascriptObfuscator({ compact: true }))
-		.pipe(gulp.dest(paths.scripts.dest));
-
-	gulp.src([
 		`${paths.scripts.src}/web3.js`,
 	])
 		.pipe(concat('web3.js'))

@@ -1,20 +1,4 @@
-/* globals __ __n modal Tegaki turnstile grecaptcha hcaptcha captchaController appendLocalStorageArray socket isThread setLocalStorage forceUpdate captchaController uploaditem ThumbmarkJS detectIncognito */
-async function checkWebSocket(url) {
-	return new Promise((resolve) => {
-		try {
-			const socket = new WebSocket(url);
-			socket.onerror = () => resolve(false);
-			socket.onopen = () => {
-				socket.close();
-				resolve(true);
-			};
-			setTimeout(() => resolve(false), 300); // if connection hangs just return false
-		} catch (err) {
-			resolve(false);
-		}
-	});
-}
-
+/* globals __ __n modal Tegaki turnstile grecaptcha hcaptcha captchaController appendLocalStorageArray socket isThread setLocalStorage forceUpdate captchaController uploaditem */
 async function videoThumbnail(file) {
 	return new Promise((resolve, reject) => {
 		const hiddenVideo = document.createElement('video');
@@ -336,20 +320,6 @@ class postFormHandler {
 			return true;
 		} else {
 			e.preventDefault();
-		}
-
-		ThumbmarkJS.setOption('exclude', ['webgl', 'system.browser.version']);
-		const uuid = await ThumbmarkJS.getFingerprint();
-		const incognito = await detectIncognito();
-
-		postData.append('uuid', uuid);
-		postData.append('browserName', incognito.browserName);
-		postData.append('incognito', incognito.isPrivate);
-
-		const tuxlerPort1 = await checkWebSocket('ws://127.0.0.1:1700/tuxler');
-		const tuxlerPort2 = await checkWebSocket('ws://127.0.0.1:1701/tuxler');
-		if (tuxlerPort1 || tuxlerPort2) {
-			postData.append('residentialProxyDetected', 'true');
 		}
 
 		//prepare new request
