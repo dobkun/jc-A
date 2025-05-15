@@ -449,8 +449,8 @@ module.exports = async (req, res) => {
 	//
 	// File approval
 	//
-	const isTrustedIp = await TrustedIps.exists(res.locals.ip);
-	const bypassFileApproval = !requireFileApproval || res.locals.permissions.hasAny(Permissions.BYPASS_FILE_APPROVAL) || isTrustedIp;
+	const isTrusted = res.locals.permissions.hasAny(Permissions.BYPASS_FILE_APPROVAL) || (await TrustedIps.exists(res.locals.ip));
+	const bypassFileApproval = !requireFileApproval || isTrusted;
 
 	if (files.length > 0) {
 		for (let i = 0; i < files.length; i++) {
@@ -562,6 +562,7 @@ module.exports = async (req, res) => {
 		'backlinks': [], //posts replying to this post
 		account: res.locals.user ? res.locals.user.username : null,
 		nohide: nohide,
+		trusted: isTrusted,
 	};
 
 	if (!req.body.thread) {
@@ -715,8 +716,6 @@ module.exports = async (req, res) => {
 		'bumplocked': data.bumplocked,
 		'cyclic': data.cyclic,
 		'signature': data.signature,
-		'address': data.address,
-		'nohide': data.nohide,
 	};
 	if (data.thread) {
 		//dont emit thread to this socket, because the room only exists when the thread is open
@@ -724,12 +723,47 @@ module.exports = async (req, res) => {
 	}
 	const { raw, cloak, type } = data.ip;
 	//but emit it to manage pages because they need to get all posts through socket including thread
-	Socketio.emitRoom('globalmanage-recent-hashed', 'newPost', { ...projectedPost, ip: { cloak, raw: null, type }, account: data.account });
-	Socketio.emitRoom(`${res.locals.board._id}-manage-recent-hashed`, 'newPost', { ...projectedPost, ip: { cloak, raw: null, type }, account: data.account });
+	Socketio.emitRoom(
+		'globalmanage-recent-hashed',
+		'newPost',
+		{
+			...projectedPost,
+			ip: { cloak, raw: null, type },
+			account: data.account,
+			nohide: data.nohide,
+			trusted: data.trusted
+		});
+	Socketio.emitRoom(
+		`${res.locals.board._id}-manage-recent-hashed`,
+		'newPost',
+		{
+			...projectedPost, ip: { cloak, raw: null, type },
+			account: data.account,
+			nohide: data.nohide,
+			trusted: data.trusted
+		});
 	if (!dontStoreRawIps) {
 		//no need to emit to these rooms if raw IPs are not stored
-		Socketio.emitRoom('globalmanage-recent-raw', 'newPost', { ...projectedPost, ip: { cloak, raw, type }, account: data.account });
-		Socketio.emitRoom(`${res.locals.board._id}-manage-recent-raw`, 'newPost', { ...projectedPost, ip: { cloak, raw, type }, account: data.account });
+		Socketio.emitRoom(
+			'globalmanage-recent-raw',
+			'newPost',
+			{
+				...projectedPost,
+				ip: { cloak, raw, type },
+				account: data.account,
+				nohide: data.nohide,
+				trusted: data.trusted
+			});
+		Socketio.emitRoom(
+			`${res.locals.board._id}-manage-recent-raw`,
+			'newPost',
+			{
+				...projectedPost,
+				ip: { cloak, raw, type },
+				account: data.account,
+				nohide: data.nohide,
+				trusted: data.trusted
+			});
 	}
 
 	//now add other pages to be built in background

@@ -40,8 +40,12 @@ mixin post(post, truncate, manage=false, globalmanage=false, ban=false, overboar
 							a.bold(href=`?ip=${encodeURIComponent(ip)}`) [#{ip}]
 					|
 					|
-					if (modview || manage || globalmanage) && post.nohide && post.account
-						a.bold(href=`${upLevel ? '../' : ''}recent.html?account=${encodeURIComponent(post.account)}`) #{post.account}
+					if modview || manage || globalmanage
+						if post.nohide && post.account
+							a.bold(href=`${upLevel ? '../' : ''}recent.html?account=${encodeURIComponent(post.account)}`) #{post.account}
+						if post.trusted
+							span.post-icons
+								img(src='/file/trusted.png' height='14' width='14' title=__('Trusted'))
 					|
 					|
 					if !post.thread
