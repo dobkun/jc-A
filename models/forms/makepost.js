@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
 	const canBypassLock = res.locals.permissions.hasAny(Permissions.MANAGE_BOARD_SETTING);
 	const { blockedCountries, threadLimit, ids, userPostSpoiler,
 		pphTrigger, tphTrigger, tphTriggerAction, pphTriggerAction,
-		sageOnlyEmail, forceAnon, replyLimit, disableReplySubject,
+		replyLimit, disableReplySubject,
 		captchaMode, lockMode, allowedFileTypes, customFlags, geoFlags, fileR9KMode, messageR9KMode,
 		requireFileApproval } = res.locals.board.settings;
 	//
@@ -493,6 +493,13 @@ module.exports = async (req, res) => {
 	if (req.body.postpassword) {
 		password = createHash('sha256').update(postPasswordSecret + req.body.postpassword).digest('base64');
 	}
+	let oppassword = null;
+	if (req.body.thread) {
+		const thread = await Posts.getPost(res.locals.board._id, req.body.thread, true);
+		if (thread.selfmod) {
+			oppassword = thread.password;
+		}
+	}
 
 	//spoiler files only if board settings allow
 	const spoiler = (!isMod || userPostSpoiler) && req.body.spoiler_all ? true : false;
@@ -545,6 +552,7 @@ module.exports = async (req, res) => {
 		'nomarkup': nomarkup || null,
 		'thread': req.body.thread || null,
 		password,
+		oppassword,
 		spoiler,
 		signature,
 		address,
@@ -714,6 +722,7 @@ module.exports = async (req, res) => {
 		'locked': data.locked,
 		'bumplocked': data.bumplocked,
 		'cyclic': data.cyclic,
+		'selfmod': data.selfmod,
 		'signature': data.signature,
 	};
 	if (data.thread) {

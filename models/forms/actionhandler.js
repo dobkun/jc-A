@@ -51,7 +51,11 @@ module.exports = async (req, res, next) => {
 			const inputPasswordHash = createHash('sha256').update(postPasswordSecret + req.body.postpassword).digest('base64');
 			const inputPasswordBuffer = Buffer.from(inputPasswordHash);
 			passwordPosts = res.locals.posts.filter(post => {
-				if (post.password != null) { //null password doesnt matter for timing attack, it cant be deleted by non-staff
+				if (post.oppassword != null) {
+					const postBuffer = Buffer.from(post.oppassword);
+					return timingSafeEqual(inputPasswordBuffer, postBuffer);
+
+				} else if (post.password != null) { //null password doesnt matter for timing attack, it cant be deleted by non-staff
 					const postBuffer = Buffer.from(post.password);
 					return timingSafeEqual(inputPasswordBuffer, postBuffer);
 				}
