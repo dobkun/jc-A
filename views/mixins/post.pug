@@ -53,8 +53,9 @@ mixin post(post, truncate, manage=false, globalmanage=false, ban=false, overboar
 					if post.subject
 						span.post-subject #{post.subject}
 						| 
-					if post.email
-						a.post-name(href=`mailto:${post.email}`) #{post.name}
+					if post.sage
+						span.post-sage #{`SAGE!`}
+						| 
 					else 
 						span.post-name #{post.name}
 					| 

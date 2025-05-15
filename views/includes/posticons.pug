@@ -1,4 +1,4 @@
-if post.sticky || post.bumplocked || post.locked || post.cyclic
+if post.sticky || post.bumplocked || post.locked || post.cyclic || post.selfmod
 	span.post-icons
 		if post.sticky
 			img(src='/file/sticky.png' height='14' width='14' title=`${__('Sticky')} (${post.sticky})`)
@@ -11,4 +11,7 @@ if post.sticky || post.bumplocked || post.locked || post.cyclic
 			| 
 		if post.cyclic
 			img(src='/file/cyclic.png' height='14' width='14' title=__('Cyclic'))
+			| 
+		if post.selfmod
+			img(src='/file/selfmoderated.png' height='14' width='14' title=__('Self Moderated'))
 			| 

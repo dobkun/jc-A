@@ -1311,6 +1311,11 @@ textarea:invalid {
 	font-weight: bold;
 }
 
+.post-sage {
+	color: var(--subject-color);
+	font-style: italic;
+}
+
 .post-capcode {
 	font-weight: bold;
 	color: var(--capcode-color);

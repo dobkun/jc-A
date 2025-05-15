@@ -15,7 +15,7 @@ section.form-wrapper.flex-center
 			section.row
 				.label Sage
 				label.postform-style
-					input(type='checkbox', name='email', value='sage')
+					input(type='checkbox', name='options', value='sage')
 			include ./subjectfield.pug
 		else
 			section.row
@@ -25,10 +25,10 @@ section.form-wrapper.flex-center
 					span.col
 						.label #{__('Sage')}
 						label.postform-style
-							input(type='checkbox', name='email', value='sage')
+							input(type='checkbox', name='options', value='sage')
 				else
 					span.col
-						input(type='text', name='email', placeholder='Options' autocomplete='off' maxlength=globalLimits.fieldLength.email)
+						input(type='text', name='options', placeholder='Options' autocomplete='off' maxlength=globalLimits.fieldLength.email)
 			include ./subjectfield.pug
 		section.row
 			.label

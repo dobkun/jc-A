@@ -498,16 +498,14 @@ module.exports = async (req, res) => {
 	const spoiler = (!isMod || userPostSpoiler) && req.body.spoiler_all ? true : false;
 
 	//forceanon and sageonlyemail only allow sage email
-	let email = (isMod || (!forceAnon && !sageOnlyEmail) || req.body.email === 'sage') ? req.body.email : null;
+	const options = req.body.options;
 	let nohide = false;
-	if (email && email !== 'sage') {
-		nohide = email.includes('nohide');
-
-		if (email.includes('sage')) {
-			email = 'sage';
-		} else {
-			email = null;
-		}
+	let selfmod = false;
+	let sage = false;
+	if (options) {
+		nohide = options.includes('nohide');
+		selfmod = options.includes('selfmod');
+		sage = options.includes('sage');
 	}
 	//disablereplysubject
 	let subject = (!isMod && req.body.thread && disableReplySubject) ? null : req.body.subject;
@@ -547,7 +545,6 @@ module.exports = async (req, res) => {
 		'nomarkup': nomarkup || null,
 		'thread': req.body.thread || null,
 		password,
-		email,
 		spoiler,
 		signature,
 		address,
@@ -563,6 +560,7 @@ module.exports = async (req, res) => {
 		account: res.locals.user ? res.locals.user.username : null,
 		nohide: nohide,
 		trusted: isTrusted,
+		sage: sage,
 	};
 
 	if (!req.body.thread) {
@@ -576,7 +574,8 @@ module.exports = async (req, res) => {
 			'locked': Mongo.NumberInt(0),
 			'bumplocked': Mongo.NumberInt(0),
 			'cyclic': Mongo.NumberInt(0),
-			'salt': salt
+			'salt': salt,
+			'selfmod': selfmod,
 		});
 	}
 
@@ -700,7 +699,7 @@ module.exports = async (req, res) => {
 		'nomarkup': data.nomarkup,
 		'thread': data.thread,
 		'postId': postId,
-		'email': data.email,
+		'sage': data.sage,
 		'spoiler': data.spoiler,
 		'banmessage': null,
 		'userId': data.userId,
@@ -783,7 +782,7 @@ module.exports = async (req, res) => {
 		});
 	} else if (data.thread) {
 		//refersh pages
-		if (data.email === 'sage' || thread.bumplocked) {
+		if (sage || thread.bumplocked) {
 			//refresh the page that the thread is on
 			buildQueue.push({
 				'task': 'buildBoard',

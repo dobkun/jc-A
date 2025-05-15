@@ -516,11 +516,10 @@ module.exports = {
 	},
 
 	insertOne: async (board, data, thread, anonymizer) => {
-		const sageEmail = data.email === 'sage';
 		const bumpLocked = thread && thread.bumplocked === 1;
 		const bumpLimited = thread && thread.replyposts >= board.settings.bumpLimit;
 		const cyclic = thread && thread.cyclic === 1;
-		const saged = sageEmail || bumpLocked || (bumpLimited && !cyclic);
+		const saged = data.sage || bumpLocked || (bumpLimited && !cyclic);
 		if (data.thread !== null) {
 			const filter = {
 				'postId': data.thread,
