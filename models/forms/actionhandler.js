@@ -363,7 +363,7 @@ module.exports = async (req, res, next) => {
 		const message = req.body.log_message || null;
 		let logUser = null;
 		//could even do if (req.session.user) {...}, but might cause cross-board log username contamination
-		if (isMod) {
+		if (isMod || res.locals.permissions.get(Permissions.MANAGE_FILE_APPROVAL)) {
 			logUser = req.session.user;
 		}
 		for (let i = 0; i < res.locals.posts.length; i++) {
