@@ -17,7 +17,7 @@ block content
 					b General
 					ul.mv-0
 						li: a(href='/rules.html') Rules
-						li: a(href='#lore') What anthro.foo is, and is not
+						li: a(href='#why-sfw') Why SFW only?
 						li: a(href='#useful-links') Useful site links
 						li: a(href='#contact') How can I contact the administration?
 					b Making posts
@@ -25,20 +25,22 @@ block content
 						li: a(href='#name-formatting') How do names, tripcodes and capcodes work?
 						li: a(href='#file-approval') How does the file approval system work?
 						li: a(href='#post-styling') What kind of styling options are available when making a post?
-						li: a(href='#post-info') What is the file size limit?
+						li: a(href='#post-options') What kind of options are available when making a post?
 	.table-container.flex-center.mv-5
-		.anchor#lore
+		.anchor#why-sfw
 		table
 			tr
-				th: a(href='#lore') What anthro.foo is, and is not
+				th: a(href='#why-sfw') Why SFW only?
 			tr
 				td
 					p
-						| Anthro.foo encourages its posters to have fun and be creative. 
-						| It has no specific focus except for being the go-to site for 
-						| anyone seeking a sfw anthro hangout, without the porn and mindrot.
-						| Start by visiting our main board <a href='/anthro/index.html'>/anthro/</a>
-						| and find a thread you like or start your own!
+						| It makes us unique, provides people a space who want a SFW only site,
+						| and keeps the site healthy. We are the only, as far as I'm aware,
+						| open for all SFW site and there is a demand for a SFW imageboard.
+						| It also makes it easier to moderate the site and avoids the blurry line
+						| of what is and isn't allowed. Remember that unlike 4chan, the staff here are
+						| all volunteers who also want to enjoy the site. Looking at porn all day,
+						| is not what any of us want to do.
 					img.faq-image(src='/file/lore.jpg' alt='Ah, I understand now... but do you?')
 	.table-container.flex-center.mv-5
 		.anchor#useful-links
@@ -249,13 +251,25 @@ block content
 					| If the language is "plain", an unsupported value, or the auto-detect confidence is too low, highlighting is disabled for the code block. 
 					| If the language is "aa", the font will be adjusted for Japanese Shift JIS art.
 	.table-container.flex-center.mv-5
-		.anchor#post-info
+		.anchor#post-options
 		table
 			tr
-				th: a(href='#post-info') What is the file size limit?
+				th(colspan=2): a(href='#post-options') Post options
 			tr
+				th Input (you can use multiple seperated by space/comma)
+				th Result
+			tr
+				td sage
 				td
-					p Max size of form data per-post is #{postFilesSize}. Because other fields e.g. name, message, etc contribute to this, the maximum size of file uploads will be very slightly smaller than this.
+					p Does not bump the thread.
+			tr
+				td selfmod
+				td
+					p For new thread only, allows OP to delete replies to their thread.
+			tr
+				td nohide
+				td
+					p Show staff your account username if you are logged in, to help us trust your account.
 	.table-container.flex-center.mv-5
 		.anchor#contact
 		table
