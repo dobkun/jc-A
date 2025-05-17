@@ -5,7 +5,7 @@ const Assets = require(__dirname + '/../../db/assets.js');
 module.exports = async (req, res, next) => {
 	let logo;
 	try {
-		// banner = await Assets.randomBanner();
+		logo = await Assets.randomLogo();
 	} catch (err) {
 		return next(err);
 	}
@@ -15,6 +15,6 @@ module.exports = async (req, res, next) => {
 		return res.redirect('/file/desulogo.png');
 	}
 
-	return res.redirect('/file/desulogo.png');
+	return res.redirect(`/logo/${logo}`);
 
 };

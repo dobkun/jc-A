@@ -24,7 +24,7 @@ const express = require('express')
 	//controllers
 	, { deleteBoardController, editBansController, appealController, globalActionController, twofactorController,
 		actionController, addCustomPageController, deleteCustomPageController, addNewsController,
-		editNewsController, deleteNewsController, uploadBannersController, deleteBannersController, addFlagsController,
+		editNewsController, deleteNewsController, addLogosController, deleteLogosController, uploadBannersController, deleteBannersController, addFlagsController,
 		deleteFlagsController, boardSettingsController, addAssetsController, deleteAssetsController,
 		deleteAccountController, loginController, registerController, changePasswordController,
 		deleteAccountsController, editAccountController, addFilterController, editFilterController, deleteFilterController,
@@ -68,6 +68,10 @@ router.post('/board/:board/deleteboard', useSession, sessionRefresh, csrf, Board
 	hasPerms.one(Permissions.MANAGE_BOARDS), deleteBoardController.paramConverter, deleteBoardController.controller); //delete board
 
 // CRUD banners, flags, assets, custompages
+router.post('/addlogos', geoIp, useSession, sessionRefresh, fileMiddlewares.banner, csrf, calcPerms, isLoggedIn,
+	hasPerms.one(Permissions.MANAGE_ASSETS), numFiles, addLogosController.controller); //add logos
+router.post('/deletelogos', useSession, sessionRefresh, csrf, calcPerms, isLoggedIn,
+	hasPerms.one(Permissions.MANAGE_ASSETS), deleteLogosController.paramConverter, deleteLogosController.controller); //delete logos
 router.post('/addbanners', geoIp, useSession, sessionRefresh, fileMiddlewares.banner, csrf, calcPerms, isLoggedIn,
 	hasPerms.one(Permissions.MANAGE_ASSETS), numFiles, uploadBannersController.controller); //add banners
 router.post('/deletebanners', useSession, sessionRefresh, csrf, calcPerms, isLoggedIn,

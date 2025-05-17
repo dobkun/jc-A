@@ -40,6 +40,44 @@ module.exports = {
 		);
 	},
 
+	getLogos: async () => {
+		let logos = await cache.sgetall('logos');
+		if (logos.length === 0) {
+			let assets = await db.findOne(
+				{ _id: 'assets' },
+				{ logos: 1, _id: 0 }
+			);
+
+			if (assets && assets.logos && assets.logos.length > 0) {
+				cache.sadd('logos', assets.logos);
+				logos = assets.logos;
+			}
+		}
+
+		return logos;
+	},
+
+	randomLogo: async () => {
+		let logo = await cache.srand('logos');
+		if (!logo) {
+			const logos = await module.exports.getLogos();
+			if (logos.length > 0) {
+				logo = logos[Math.floor(Math.random() * logos.length)];
+			}
+		}
+		return logo;
+	},
+
+	addLogos: (filenames) => {
+		cache.del('logos');
+		return module.exports.addToArray('logos', filenames);
+	},
+
+	removeLogos: (filenames) => {
+		cache.del('logos');
+		return module.exports.removeFromArray('logos', filenames);
+	},
+
 	getBanners: async () => {
 		let banners = await cache.sgetall('banners');
 		if (banners.length === 0) {

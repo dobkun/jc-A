@@ -287,6 +287,8 @@ async function wipe() {
 		del(['static/captcha/*']),
 		del(['static/html/*']),
 		del(['static/json/*']),
+		del(['static/logo/*']),
+		del(['static/boardad/*']),
 		del(['static/banner/*']),
 		del(['static/flag/*']),
 		del(['static/notfoundimage/*']),
@@ -298,6 +300,8 @@ async function wipe() {
 	return Promise.all([
 		fs.ensureDir(`${uploadDirectory}/captcha`),
 		fs.ensureDir(`${uploadDirectory}/file/thumb`),
+		fs.ensureDir(`${uploadDirectory}/logo`),
+		fs.ensureDir(`${uploadDirectory}/boardad`),
 		fs.ensureDir(`${uploadDirectory}/banner`),
 		fs.ensureDir(`${uploadDirectory}/flag`),
 		fs.ensureDir(`${uploadDirectory}/notfoundimage`),

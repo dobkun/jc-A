@@ -10,6 +10,12 @@ block content
 	br
 	+globalmanagenav('assets')
 	hr(size=1)
+	+fileform('logo', globalLimits.bannerFiles.max, globalLimits.bannerFiles.total,
+		'/forms/addlogos', '/forms/deletelogos',
+		'checkedlogos', logos, logos, '/logo',
+		'asset-banner', false, false,
+		__('Images randomly chosen and displayed at the top of most pages on the board'))
+	hr(size=1)
 	+fileform('banner', globalLimits.bannerFiles.max, globalLimits.bannerFiles.total,
 		'/forms/addbanners', '/forms/deletebanners',
 		'checkedbanners', banners, banners, '/banner',
