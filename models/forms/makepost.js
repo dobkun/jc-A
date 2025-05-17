@@ -12,6 +12,7 @@ const { createHash, randomBytes } = require('crypto')
 	, nameHandler = require(__dirname + '/../../lib/post/name.js')
 	, getFilterStrings = require(__dirname + '/../../lib/post/getfilterstrings.js')
 	, checkFilters = require(__dirname + '/../../lib/post/checkfilters.js')
+	, checkUrls = require(__dirname + '/../../lib/post/checkurls.js')
 	, filterActions = require(__dirname + '/../../lib/post/filteractions.js')
 	, { prepareMarkdown } = require(__dirname + '/../../lib/post/markdown/markdown.js')
 	, messageHandler = require(__dirname + '/../../lib/post/message.js')
@@ -68,17 +69,6 @@ module.exports = async (req, res) => {
 		replyLimit, disableReplySubject,
 		captchaMode, lockMode, allowedFileTypes, customFlags, geoFlags, fileR9KMode, messageR9KMode,
 		requireFileApproval } = res.locals.board.settings;
-	//
-	// Check ports
-	//
-	if (req.body.residentialProxyDetected) {
-		await deleteTempFiles(req).catch(console.error);
-		return dynamicResponse(req, res, 403, 'message', {
-			'title': __('Forbidden'),
-			'message': __('Something went wrong'),
-			'redirect': redirect
-		});
-	}
 
 	//
 	// Check if country is blocked
@@ -155,9 +145,8 @@ module.exports = async (req, res) => {
 	if (!res.locals.permissions.get(Permissions.BYPASS_FILTERS)) {
 
 		//deconstruct global filter settings to differnt names, else they would conflict with the respective board-level setting
-		const [globalFilters, localFilters] = await Promise.all([
+		const [globalFilters] = await Promise.all([
 			Filters.findForBoard(null),
-			Filters.findForBoard(res.locals.board._id)
 		]);
 
 		let hitFilters = false
@@ -168,10 +157,6 @@ module.exports = async (req, res) => {
 		hitFilters = checkFilters(globalFilters, combinedString, strictCombinedString);
 		if (hitFilters) {
 			globalFilter = true;
-		}
-		//if none matched, check local filters
-		if (!hitFilters) {
-			hitFilters = checkFilters(localFilters, combinedString, strictCombinedString);
 		}
 
 		if (hitFilters) {
@@ -197,6 +182,8 @@ module.exports = async (req, res) => {
 				}
 			}
 		}
+
+		req.body.message = checkUrls(req.body.message);
 	}
 
 	//for r9k messages. usually i wouldnt process these if its not enabled e.g. flags and IDs but in this case I think its necessary
