@@ -101,15 +101,19 @@ module.exports = {
 			//edit post only allows single post
 			return res.redirect(`/${res.locals.posts[0].board}/manage/editpost/${res.locals.posts[0].postId || res.locals.posts[0].thread}.html`);
 		} else if (req.body.move) {
-			if (!res.locals.destinationBoard) {
+			if (!res.locals.destinationBoard && !res.locals.destinationThread) {
 				return dynamicResponse(req, res, 400, 'message', {
 					'title': __('Bad Request'),
 					'error': __('Invalid post move destination'),
 					'redirect': `/${req.params.board}/`
 				});
 			}
-			if (!req.body.move_to_board || req.body.move_to_board === req.params.board) {
+			if (req.body.move_to_thread
+				&& (!req.body.move_to_board || req.body.move_to_board === req.params.board)) {
 				//If moving to thread on the same board, filter posts that are already in the destination thread
+				res.locals.posts = res.locals.posts.filter(p => {
+					return p.postId !== req.body.move_to_thread && p.thread !== req.body.move_to_thread;
+				});
 				if (res.locals.posts.length === 0) {
 					return dynamicResponse(req, res, 409, 'message', {
 						'title': __('Conflict'),
@@ -119,6 +123,7 @@ module.exports = {
 				}
 			}
 		}
+
 
 		try {
 			await actionHandler(req, res, next);
