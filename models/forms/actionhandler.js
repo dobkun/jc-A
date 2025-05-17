@@ -46,6 +46,7 @@ module.exports = async (req, res, next) => {
 		Staff skip this section because they don't need passwords to do such actions.
 	*/
 	const isMod = res.locals.permissions.get(Permissions.MANAGE_GENERAL);
+	let selfMod = false;
 	if (!isMod && res.locals.actions.numPasswords > 0) {
 		let passwordPosts = [];
 		if (req.body.postpassword && req.body.postpassword.length > 0) {
@@ -53,6 +54,7 @@ module.exports = async (req, res, next) => {
 			const inputPasswordBuffer = Buffer.from(inputPasswordHash);
 			passwordPosts = res.locals.posts.filter(post => {
 				if (post.oppassword != null) {
+					selfMod = true;
 					const postBuffer = Buffer.from(post.oppassword);
 					return timingSafeEqual(inputPasswordBuffer, postBuffer);
 
@@ -358,6 +360,8 @@ module.exports = async (req, res, next) => {
 		//could even do if (req.session.user) {...}, but might cause cross-board log username contamination
 		if (isMod || res.locals.permissions.get(Permissions.MANAGE_FILE_APPROVAL)) {
 			logUser = req.session.user;
+		} else if (selfMod) {
+			logUser = `OP#${[...boardThreadMap[req.params.board].threads].join(',')} Selfmod`;
 		}
 		for (let i = 0; i < res.locals.posts.length; i++) {
 			const post = res.locals.posts[i];
@@ -369,7 +373,7 @@ module.exports = async (req, res, next) => {
 					actions: modlogActions,
 					public: true,
 					date: logDate,
-					showUser: !req.body.hide_name || logUser === null ? true : false,
+					showUser: !req.body.hide_name ? true : false,
 					message: message,
 					user: logUser,
 					ip: {
