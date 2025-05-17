@@ -15,7 +15,7 @@ module.exports = {
 		timeFields: ['ban_duration'],
 		trimFields: ['postpassword', 'report_reason', 'ban_reason', 'log_message', 'move_to_board'],
 		allowedArrays: ['checkedreports', 'checkedposts'],
-		numberFields: ['sticky'],
+		numberFields: ['move_to_thread', 'sticky'],
 		numberArrays: ['checkedposts'],
 	}),
 
@@ -46,7 +46,17 @@ module.exports = {
 			{ result: lengthBody(req.body.log_message, 0, globalLimits.fieldLength.log_message), expected: false, error: __('Modlog message must be %s characters or less', globalLimits.fieldLength.log_message) },
 			{ result: (existsBody(req.body.report || req.body.global_report) && lengthBody(req.body.report_reason, 1)), expected: false, blocking: true, error: __('Reports must have a reason') },
 			{ result: (existsBody(req.body.move) && (!req.body.move_to_board)), expected: false, error: __('Must input destination board to move thread') },
-			{ result: existsBody(req.body.move) && req.body.checkedposts.length > 1, expected: false, error: __('Must select a single thread to move') },
+			{ result: (existsBody(req.body.move) && (!req.body.move_to_thread && !req.body.move_to_board)), expected: false, error: __('Must input destinaton thread number or board to move posts') },
+			{
+				result: async () => {
+					if (req.body.move && req.body.move_to_thread) {
+						const moveBoard = req.body.move_to_board || req.params.board;
+						res.locals.destinationThread = await Posts.getPost(moveBoard, req.body.move_to_thread);
+						return res.locals.destinationThread != null;
+					}
+					return true;
+				}, expected: true, error: __('Destination for move does not exist')
+			},
 			{
 				result: async () => {
 					if (req.body.move && req.body.move_to_board
@@ -57,11 +67,10 @@ module.exports = {
 
 						const destinationBoard = await Boards.findOne(req.body.move_to_board);
 						res.locals.destinationBoard = destinationBoard;
-
 						return res.locals.destinationBoard != null;
 					}
 					return true;
-				}, expected: true, error: __('Destination for move does not exist')
+				}, expected: true, error: __('Destination for move does not exist, or you do not have permission')
 			},
 			{ result: existsBody(req.body.approve) && existsBody(req.body.deny), expected: false, error: __('You may only bulk approve or deny, not both.') },
 		], res.locals.permissions);

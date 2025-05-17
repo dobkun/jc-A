@@ -206,43 +206,27 @@ module.exports = async (req, res, next) => {
 		}
 
 	} else if (req.body.move) {
-		switch (boardThreadMap[req.params.board].directThreads.size) {
-			case 0:
-				return dynamicResponse(req, res, 403, 'message', {
-					'title': __(''),
-					'error': __('You may only move a thread.'),
-					redirect,
-				});
-			case 1: {
-				const threadId = [...boardThreadMap[req.params.board].directThreads][0];
-				const fetchMoveReplies = await Posts.db.find({
-					'board': req.params.board,
-					'thread': {
-						'$eq': threadId
-					}
-				}).toArray();
-				res.locals.posts = res.locals.posts.concat(fetchMoveReplies);
-				const { message, action } = await movePosts(req, res);
-				if (action) {
-					modlogActions.push(ModlogActions.MOVE);
-					recalculateThreadMetadata = true;
-					if (res.locals.destinationBoard && res.locals.destinationThread) {
-						res.locals.posts.push(res.locals.destinationThread);
-						({ boardThreadMap, numPagesBeforeActions, affectedBoardNames } = await getAffectedBoards(res.locals.posts, deleting));
-						minimalThreadsMap = await Posts.getMinimalThreads(affectedBoardNames);
-					}
+		if (boardThreadMap[req.params.board].directThreads.size > 0) {
+			const threadIds = [...boardThreadMap[req.params.board].directThreads];
+			const fetchMovePosts = await Posts.db.find({
+				'board': req.params.board,
+				'thread': {
+					'$in': threadIds
 				}
-				messages.push(message);
-				redirect = `/${res.locals.board._id}/manage/index.html`;
-				break;
-			}
-			default:
-				return dynamicResponse(req, res, 403, 'message', {
-					'title': __(''),
-					'error': __('You may only move one thread.'),
-					redirect,
-				});
+			}).toArray();
+			res.locals.posts = res.locals.posts.concat(fetchMovePosts);
 		}
+		const { message, action } = await movePosts(req, res);
+		if (action) {
+			modlogActions.push(ModlogActions.MOVE);
+			recalculateThreadMetadata = true;
+			if (res.locals.destinationBoard && res.locals.destinationThread) {
+				res.locals.posts.push(res.locals.destinationThread);
+				({ boardThreadMap, numPagesBeforeActions, affectedBoardNames } = await getAffectedBoards(res.locals.posts, deleting));
+				minimalThreadsMap = await Posts.getMinimalThreads(affectedBoardNames);
+			}
+		}
+		messages.push(message);
 	} else {
 		// handle approvals first, may lead to file deletion
 		if (req.body.approve || req.body.deny) {

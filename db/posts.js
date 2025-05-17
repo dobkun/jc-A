@@ -864,31 +864,35 @@ module.exports = {
 		return db.deleteMany();
 	},
 
-	move: async (postMongoIds, destinationBoard) => {
-		let bulkWrites = [];
-		const newDestinationThreadId = await Boards.getNextId(destinationBoard, false, postMongoIds.length);
-
+	move: async (postIds, postMongoIds, crossBoard, destinationThreadId, destinationBoard) => {
+		let bulkWrites = [], newDestinationThreadId = destinationThreadId;
 		const newPostIdMap = {};
-		for (let i = 0; i < postMongoIds.length; i++) {
-			const id = postMongoIds[i];
-			const newPostId = newDestinationThreadId + i;
-			newPostIdMap[id] = newPostId;
+		if (crossBoard) {
+			//postIds need to be adjusted if moving to a different board
+			const lastId = await Boards.getNextId(destinationBoard, false, postMongoIds.length);
+			//if moving board and no destination thread, pick the starting ID of the amount we incremented
+			if (!destinationThreadId) {
+				newDestinationThreadId = lastId;
+			}
+			for (let i = 0; i < postMongoIds.length; i++) {
+				const postMongoId = postMongoIds[i];
+				const newPostId = lastId + i;
+				newPostIdMap[postIds[i]] = newPostId;
 
-			bulkWrites.push({
-				'updateOne': {
-					'filter': {
-						'_id': id,
-					},
-					'update': {
-						'$set': {
-							'postId': newPostId,
+				bulkWrites.push({
+					'updateOne': {
+						'filter': {
+							'_id': postMongoId,
+						},
+						'update': {
+							'$set': {
+								'postId': newPostId,
+							}
 						}
 					}
-				}
-			});
+				});
+			}
 		}
-
-		// update other metadata
 		bulkWrites.push({
 			'updateMany': {
 				'filter': {
@@ -912,32 +916,33 @@ module.exports = {
 				}
 			}
 		});
-
-		const salt = (await db.findOne({ _id: postMongoIds[0] })).salt;
-		// Make new OP
-		bulkWrites.push({
-			'updateOne': {
-				'filter': {
-					'_id': postMongoIds[0],
-				},
-				'update': {
-					'$set': {
-						'thread': null,
-						'replyposts': 0,
-						'replyfiles': 0,
-						'sticky': 0,
-						'locked': 0,
-						'bumplocked': 0,
-						'cyclic': 0,
-						'salt': salt,
+		if (!destinationThreadId) {
+			const salt = (await db.findOne({ _id: postMongoIds[0] })).salt;
+			//No destination thread i.e we are maing a new thread from the selected posts, make one the OP
+			bulkWrites.push({
+				'updateOne': {
+					'filter': {
+						'_id': postMongoIds[0],
+					},
+					'update': {
+						'$set': {
+							'thread': null,
+							'replyposts': 0,
+							'replyfiles': 0,
+							'sticky': 0,
+							'locked': 0,
+							'bumplocked': 0,
+							'cyclic': 0,
+							'salt': salt,
+						}
 					}
 				}
-			}
-		});
-
+			});
+		}
 		// console.log(JSON.stringify(bulkWrites, null, 4));
 		const movedPosts = await db.bulkWrite(bulkWrites).then(result => result.modifiedCount);
-		return { movedPosts, destinationThreadId: newDestinationThreadId, _idToPostId: newPostIdMap };
+		return { movedPosts, destinationThreadId: newDestinationThreadId, OldToNewPostIds: newPostIdMap };
+
 	},
 
 	threadExistsMiddleware: async (req, res, next) => {
