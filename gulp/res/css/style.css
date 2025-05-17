@@ -21,7 +21,10 @@ main.minimal {
 }
 
 .logo {
+	min-width: 128px;
+	min-height: 128px;
 	width: 128px;
+	border: 1px solid var(--post-outline-color);
 	height: auto;
 }
 
