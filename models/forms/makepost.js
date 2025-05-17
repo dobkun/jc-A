@@ -570,7 +570,7 @@ module.exports = async (req, res) => {
 			'bumplocked': Mongo.NumberInt(0),
 			'cyclic': Mongo.NumberInt(0),
 			'salt': salt,
-			'selfmod': selfmod,
+			'selfmod': selfmod ? Mongo.NumberInt(1) : Mongo.NumberInt(0),
 		});
 	}
 

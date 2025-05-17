@@ -9,6 +9,7 @@ const { TrustedIps, Posts, Boards, Modlogs } = require(__dirname + '/../../db/')
 	, stickyPosts = require(__dirname + '/stickyposts.js')
 	, bumplockPosts = require(__dirname + '/bumplockposts.js')
 	, lockPosts = require(__dirname + '/lockposts.js')
+	, selfmodPosts = require(__dirname + '/selfmodposts.js')
 	, cyclePosts = require(__dirname + '/cycleposts.js')
 	, deletePostsFiles = require(__dirname + '/deletepostsfiles.js')
 	, reportPosts = require(__dirname + '/reportpost.js')
@@ -287,6 +288,14 @@ module.exports = async (req, res, next) => {
 			const { message, action, query } = cyclePosts(res.locals);
 			if (action) {
 				modlogActions.push(ModlogActions.CYCLE);
+				combinedQuery[action] = { ...combinedQuery[action], ...query };
+			}
+			messages.push(message);
+		}
+		if (req.body.selfmod) {
+			const { message, action, query } = selfmodPosts(res.locals);
+			if (action) {
+				modlogActions.push(ModlogActions.SELFMOD);
 				combinedQuery[action] = { ...combinedQuery[action], ...query };
 			}
 			messages.push(message);
