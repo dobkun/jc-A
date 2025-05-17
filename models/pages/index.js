@@ -15,6 +15,7 @@ module.exports = {
 	create: require(__dirname + '/create.js'),
 	board: require(__dirname + '/board.js'),
 	catalog: require(__dirname + '/catalog.js'),
+	logos: require(__dirname + '/logos.js'),
 	banners: require(__dirname + '/banners.js'),
 	pages: require(__dirname + '/pages.js'),
 	boardSettings: require(__dirname + '/boardsettings.js'),

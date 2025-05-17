@@ -99,18 +99,18 @@ module.exports = async (req, res) => {
 
 	// add logos to the db
 	await Assets.addLogos(filenames);
-	// get new banners and recache
-	// const banners = await Assets.getLogos();
+	// get new logos and recache
+	const logos = await Assets.getLogos();
 
-	/* if (filenames.length > 0) {
+	if (filenames.length > 0) {
 		//add public banners page to build queue
 		buildQueue.push({
-			'task': 'buildBanners',
+			'task': 'buildLogos',
 			'options': {
-				'banners': banners,
+				'logos': logos,
 			}
 		});
-	} */
+	}
 
 	return dynamicResponse(req, res, 200, 'message', {
 		'title': __('Success'),

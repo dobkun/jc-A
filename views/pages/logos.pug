@@ -1,0 +1,16 @@
+extends ../layout.pug
+include ../mixins/boardheader.pug
+include ../mixins/boardnav.pug
+
+block head
+	title #{__('Logos')}
+
+block content
+	h1.board-title #{__('Logos')}
+	include ../includes/stickynav.pug
+	if logos && logos.length > 0
+		.catalog
+			each logo in logos
+				img.board-banner(src=`/logo/${logo}` loading='lazy')
+	else
+		p #{__('Site has no logos.')}

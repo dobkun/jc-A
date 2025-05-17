@@ -20,15 +20,15 @@ module.exports = async (req, res) => {
 	//remove from db
 	await Assets.removeLogos(req.body.checkedlogos);
 	// get new logos and recache
-	// const banners = await Assets.getBanners();
+	const logos = await Assets.getLogos();
 
 	//rebuild public banners page
-	/* 	buildQueue.push({
-			'task': 'buildBanners',
-			'options': {
-				'banners': banners,
-			}
-		}); */
+	buildQueue.push({
+		'task': 'buildLogos',
+		'options': {
+			'logos': logos,
+		}
+	});
 
 	return dynamicResponse(req, res, 200, 'message', {
 		'title': __('Success'),
