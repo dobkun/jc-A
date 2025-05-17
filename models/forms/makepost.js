@@ -63,7 +63,7 @@ module.exports = async (req, res) => {
 	let salt = null;
 	let thread = null;
 	const isMod = res.locals.permissions.get(Permissions.VIEW_MANAGE);
-	const canBypassLock = res.locals.permissions.hasAny(Permissions.MANAGE_BOARD_SETTING);
+	const canBypassLock = res.locals.permissions.hasAny(Permissions.MANAGE_GENERAL);
 	const { blockedCountries, threadLimit, ids, userPostSpoiler,
 		pphTrigger, tphTrigger, tphTriggerAction, pphTriggerAction,
 		replyLimit, disableReplySubject,
