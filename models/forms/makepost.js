@@ -183,6 +183,10 @@ module.exports = async (req, res) => {
 			}
 		}
 
+	}
+
+	const isTrusted = res.locals.permissions.hasAny(Permissions.BYPASS_FILE_APPROVAL) || (await TrustedIps.exists(res.locals.ip));
+	if (!isTrusted) {
 		req.body.message = checkUrls(req.body.message);
 	}
 
@@ -436,7 +440,6 @@ module.exports = async (req, res) => {
 	//
 	// File approval
 	//
-	const isTrusted = res.locals.permissions.hasAny(Permissions.BYPASS_FILE_APPROVAL) || (await TrustedIps.exists(res.locals.ip));
 	const bypassFileApproval = !requireFileApproval || isTrusted;
 
 	if (files.length > 0) {
