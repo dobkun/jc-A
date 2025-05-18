@@ -45,9 +45,15 @@ module.exports = async (req, res, next) => {
 		Handle checking passwords (in a time-constant) when doing actions that require a password.
 		Staff skip this section because they don't need passwords to do such actions.
 	*/
+	const isApprover = res.locals.permissions.get(Permissions.MANAGE_FILE_APPROVAL);
 	const isMod = res.locals.permissions.get(Permissions.MANAGE_GENERAL);
 	let selfMod = false;
-	if (!isMod && res.locals.actions.numPasswords > 0) {
+
+	let spoileringFile = false;
+	if (req.body.spoiler && res.locals.posts.length === 1 && req.body.file_action_filename && isApprover) {
+		spoileringFile = true;
+	}
+	if (!spoileringFile && !isMod && res.locals.actions.numPasswords > 0) {
 		let passwordPosts = [];
 		if (req.body.postpassword && req.body.postpassword.length > 0) {
 			const inputPasswordHash = createHash('sha256').update(postPasswordSecret + req.body.postpassword).digest('base64');
