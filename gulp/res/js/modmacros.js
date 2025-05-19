@@ -106,18 +106,21 @@ class modMacroHandler {
 				break;
 			case 'rule3':
 				this.reset();
+				this.set('delete', true);
 				this.set('global_ban', true);
 				this.set('ban_reason', 'rule 3');
 				this.set('ban_duration', '100y');
 				break;
 			case 'rule4':
 				this.reset();
+				this.set('delete', true);
 				this.set('global_ban', true);
 				this.set('ban_reason', 'rule 4');
 				this.set('ban_duration', '1h');
 				break;
 			case 'rule5':
 				this.reset();
+				this.set('delete', true);
 				this.set('global_ban', true);
 				this.set('ban_reason', 'rule 5');
 				break;
