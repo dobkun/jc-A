@@ -76,6 +76,14 @@ module.exports = async (req, res) => {
 				'approvePost',
 				{ ...post },
 			);
+			Socketio.emitRoom(
+				'globalmanage-recent-hashed',
+				'approvePost',
+				{ ...post });
+			Socketio.emitRoom(
+				'globalmanage-recent-raw',
+				'approvePost',
+				{ ...post });
 		}
 	}
 
