@@ -377,7 +377,7 @@ module.exports = async (req, res, next) => {
 					showLinks: !deleting,
 					postLinks: [], //TODO: rename this to just "links"
 					actions: modlogActions,
-					public: true,
+					public: req.body.approve && res.locals.actions.validActions.length === 1 ? false : true,
 					date: logDate,
 					showUser: !req.body.hide_name ? true : false,
 					message: message,
