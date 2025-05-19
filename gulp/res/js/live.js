@@ -1,4 +1,4 @@
-/* globals __ isRecent banmessage isGlobalRecent isThread post extraLocals isModView io setLocalStorage isManage */
+/* globals __ isRecent banmessage isGlobalRecent isThread postfile post extraLocals isModView io setLocalStorage isManage */
 let liveEnabled = localStorage.getItem('live') == 'true';
 let scrollEnabled = localStorage.getItem('scroll') == 'true';
 let socket;
@@ -6,7 +6,7 @@ let socketPingInterval;
 let forceUpdate;
 let newPost;
 
-window.addEventListener('settingsReady', function() { //after domcontentloaded
+window.addEventListener('settingsReady', function () { //after domcontentloaded
 
 	let supportsWebSockets = 'WebSocket' in window || 'MozWebSocket' in window;
 	const livecolor = document.getElementById('livecolor');
@@ -32,22 +32,35 @@ window.addEventListener('settingsReady', function() { //after domcontentloaded
 	//add text before post-info to show posts deleted, moved, etc
 	const approvePost = (data) => {
 		console.log('got approve post message', data);
+
 		const anchor = document.getElementById(data.postId);
 		const postContainer = anchor.nextSibling;
 
-		let insertPoint = postContainer.nextSibling;
-		let insertPosition = 'beforeBegin';
-		if (!insertPoint) {
-			//No next sibling, this is the last post in a thread
-			insertPoint = postContainer.parentElement;
-			insertPosition = 'beforeEnd';
+		if (!postContainer) {
+			console.warn(`post with ID ${post.postId} not found`);
+			return;
 		}
-		anchor.remove();
-		postContainer.remove();
-		newPost(data, {
-			nonotify: true, //should we notify of edits in open threads, maybe just for OP? idk
-			insertPoint,
-			insertPosition,
+
+		const filesContainer = postContainer.querySelector('.post-files');
+		if (!filesContainer) {
+			console.warn(`files container not found in post ${data.postId}`);
+			return;
+		}
+
+		// Clear the existing content
+		filesContainer.innerHTML = '';
+
+		// Append updated file entries
+		data.files.forEach(file => {
+			const fileHTML = postfile({
+				post: data,
+				file: file,
+				modview: isModView,
+				manage: (isRecent && !isGlobalRecent),
+				globalmanage: isGlobalRecent,
+				...extraLocals,
+			});
+			filesContainer.insertAdjacentHTML('beforeend', fileHTML);
 		});
 	};
 
@@ -225,7 +238,7 @@ window.addEventListener('settingsReady', function() { //after domcontentloaded
 	let jsonParts = window.location.pathname.replace(/\.html$/, '.json').replace('+50', '').split('/');
 	let jsonPath;
 	if (isModView) {
-		jsonParts.splice(2,1); //remove manage from json url
+		jsonParts.splice(2, 1); //remove manage from json url
 	}
 	jsonPath = jsonParts.join('/');
 	const fetchNewPosts = async () => {
@@ -261,7 +274,7 @@ window.addEventListener('settingsReady', function() { //after domcontentloaded
 		if ((await fetchNewPosts()) > 0) {
 			interval = 5000;
 		} else {
-			interval = Math.min(interval*2, 90000);
+			interval = Math.min(interval * 2, 90000);
 		}
 		setTimeout(() => {
 			updateButton.disabled = false;
@@ -274,7 +287,7 @@ window.addEventListener('settingsReady', function() { //after domcontentloaded
 
 	setInterval(() => {
 		if (liveEnabled && intervalStart) {
-			const remaining = Math.abs((interval - (Date.now() - intervalStart))/1000);
+			const remaining = Math.abs((interval - (Date.now() - intervalStart)) / 1000);
 			updateButton.value = `Update (${remaining.toFixed(0)}s)`;
 		}
 	}, 1000);
@@ -284,7 +297,7 @@ window.addEventListener('settingsReady', function() { //after domcontentloaded
 			updateButton.style.display = 'none';
 			if (!room) {
 				const roomParts = window.location.pathname.replace(/\.html$/, '').replace('+50', '').split('/');
-				room = `${roomParts[1]}-${roomParts[roomParts.length-1]}`;
+				room = `${roomParts[1]}-${roomParts[roomParts.length - 1]}`;
 			}
 			socket = io({
 				transports: ['websocket'],

@@ -16,7 +16,6 @@ const config = require(__dirname + '/lib/misc/config.js')
 	, concat = require('gulp-concat')
 	, cleanCSS = require('gulp-clean-css')
 	, uglify = require('gulp-uglify-es').default
-	, javascriptObfuscator = require('gulp-javascript-obfuscator')
 	, realFavicon = require('gulp-real-favicon')
 	, del = require('del')
 	, pug = require('pug')
@@ -528,7 +527,7 @@ const extraLocals = ${JSON.stringify({ meta: config.get.meta, reverseImageLinksU
 		//		fs.writeFileSync('gulp/res/js/pugruntime.js', pugRuntimeFuncs);
 
 		//compile some pug client side functions
-		['modal', 'post', 'uploaditem', 'pugfilters', 'captchaformsection', 'watchedthread', 'threadwatcher', 'banmessage']
+		['postfile', 'modal', 'post', 'uploaditem', 'pugfilters', 'captchaformsection', 'watchedthread', 'threadwatcher', 'banmessage']
 			.forEach(templateName => {
 				const compilationOptions = {
 					compileDebug: false,
@@ -563,6 +562,7 @@ const extraLocals = ${JSON.stringify({ meta: config.get.meta, reverseImageLinksU
 		`${paths.scripts.src}/modal.js`,
 		`${paths.scripts.src}/pugfilters.js`,
 		`${paths.scripts.src}/banmessage.js`,
+		`${paths.scripts.src}/postfile.js`,
 		`${paths.scripts.src}/post.js`,
 		`${paths.scripts.src}/settings.js`,
 		`${paths.scripts.src}/live.js`,
@@ -583,7 +583,7 @@ const extraLocals = ${JSON.stringify({ meta: config.get.meta, reverseImageLinksU
 		`!${paths.scripts.src}/renderweb3.js`,
 	])
 		.pipe(concat('all.js'))
-		.pipe(javascriptObfuscator({ compact: true }))
+		.pipe(uglify({ compress: true }))
 		.pipe(gulp.dest(paths.scripts.dest));
 
 	gulp.src([

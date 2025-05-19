@@ -19,6 +19,7 @@ gulp/res/icons/*
 # no compiledclients js files generated from .pug in gulpfile
 gulp/res/js/locals.js
 gulp/res/js/post.js
+gulp/res/js/postfile.js
 gulp/res/js/modal.js
 gulp/res/js/captchaformsection.js
 gulp/res/js/pugfilters.js

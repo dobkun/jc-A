@@ -71,19 +71,33 @@ module.exports = async (req, res) => {
 				}
 			}
 
+			const projectedPost = {
+				postId: post.postId,
+				files: post.files,
+				u: post.u,
+				spoiler: post.spoiler,
+			};
+
 			Socketio.emitRoom(
 				`${post.board}-${post.thread || post.postId}`,
 				'approvePost',
-				{ ...post },
-			);
+				projectedPost);
 			Socketio.emitRoom(
 				'globalmanage-recent-hashed',
 				'approvePost',
-				{ ...post });
+				projectedPost);
 			Socketio.emitRoom(
 				'globalmanage-recent-raw',
 				'approvePost',
-				{ ...post });
+				projectedPost);
+			Socketio.emitRoom(
+				`${post.board}-manage-recent-hashed`,
+				'approvePost',
+				projectedPost);
+			Socketio.emitRoom(
+				`${post.board}-manage-recent-raw`,
+				'approvePost',
+				projectedPost);
 		}
 	}
 

@@ -1,0 +1,63 @@
+include ./filependingapproval.pug
+include ../mixins/fileactions.pug
+
+mixin postfile(post, file, manage=false, globalmanage=false, overboard=false)
+	.post-file
+		- const type = file.mimetype.split('/')[0]
+		if file.approved || manage || modview || globalmanage
+			span.post-file-info
+				-const unixtimestamp = `${post.u}${fileindex > 0 ? `-${fileindex}`:''}`
+				span
+					a.filename(href=`/file/${file.filename}` title=`${file.originalFilename}` download=file.originalFilename) #{post.spoiler || file.spoiler ? __('Spoiler File') : file.originalFilename}
+					|
+					|
+					a.filename(href=`/file/${file.filename}` title=`${unixtimestamp}${file.extension}` download=`${unixtimestamp}${file.extension}`) #{'U'}
+					|
+					|
+					a.filename(href=`/file/${file.filename}` title=`${unixtimestamp} ${file.originalFilename}` download=`${unixtimestamp} ${file.originalFilename}`) #{'A'}
+				br
+				if globalmanage && file.phash != null
+					span #{file.phash}
+					br
+				if !file.attachment && !(post.spoiler || file.spoiler)
+					span.jsonly
+						b [
+						a.dummy-link.hide-image.noselect(data-src=`/file/${file.hasThumb ? 'thumb/'+file.hash+file.thumbextension : file.filename}`) #{__('Hide')}
+						b ]
+				span 
+					|  (#{file.sizeString}
+					if file.geometryString
+						| , #{file.geometryString}
+					if file.durationString
+						| , #{file.durationString}
+					| )
+				if type === 'image'
+					if (board && board.settings.reverseImageSearchLinks === true) || (overboard && overboardReverseLinks === true) || manage || modview || globalmanage
+						br
+						span: a(href=`${reverseImageLinksURL.replace('%s', encodeURIComponent(meta.url+'/file/'+file.filename))}` rel='nofollow' referrerpolicy='same-origin' title=__('Reverse Image Search') target='_blank') #{__('Reverse')}
+					if file.originalFilename.endsWith('-tegaki.png')
+						- const matchingReplayFile = post.files.find(f => f.originalFilename.slice(0, -4) === file.originalFilename.slice(0,-3));
+						if matchingReplayFile !== undefined
+							|  
+							span: a.dummy-link.replay-tegaki.noselect(href=`/file/${matchingReplayFile.filename}` download=matchingReplayFile.originalFilename) #{__('Replay')}
+				if file.mimetype === 'tegaki/replay'
+					|  
+					span.jsonly: a.dummy-link.replay-tegaki.noselect(href=`/file/${file.filename}` download=file.originalFilename) #{__('Replay')}
+		if !(manage || modview || globalmanage || file.approved)
+			+filependingapproval()
+		else
+			.post-file-src(data-type=type data-attachment=(file.attachment ? "true" : "false"))
+				a(target='_blank' href=`/file/${file.filename}`)
+					if post.spoiler || file.spoiler
+						div.spoilerimg.file-thumb
+					else if file.hasThumb
+						img.file-thumb(src=`/file/thumb/${file.hash}${file.thumbextension}` height=file.geometry.thumbheight width=file.geometry.thumbwidth loading='lazy')
+					else if file.attachment
+						div.attachmentimg.file-thumb(data-mimetype=file.mimetype)
+					else if type === 'audio'
+						div.audioimg.file-thumb
+					else
+						img.file-thumb(src=`/file/${file.filename}` height=file.geometry.height width=file.geometry.width loading='lazy')
+			if manage || modview || globalmanage
+				+fileactions(file.filename, file.approved)
+	
