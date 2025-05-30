@@ -66,6 +66,20 @@ if (!isCatalog) { //dont show embed buttons in catalog
 					return null;
 				}
 			},
+			{
+				linkRegex: /^https?:\/\/(?:www\.)?strawpoll\.com\/.+/i,
+				toHtml: (url) => {
+					try {
+						const urlObject = new URL(url);
+						const strawpollId = urlObject.pathname;
+						if (strawpollId) {
+							return ['<iframe style="height: 300px; max-width: 640px; width: 100%; margin-top: 4px; display: block;" src="" frameborder="0" allowtransparency></iframe>',
+								`https://strawpoll.com/embed${strawpollId}`];
+						}
+					} catch (e) { /*invalid url*/ }
+					return null;
+				}
+			}
 			//TODO: add more of these
 		];
 
