@@ -62,6 +62,16 @@ window.addEventListener('settingsReady', function () { //after domcontentloaded
 			});
 			filesContainer.insertAdjacentHTML('beforeend', fileHTML);
 		});
+
+		const newPostEvent = new CustomEvent('approvePost', {
+			detail: {
+				post: postContainer,
+			}
+		});
+		//dispatch the event so quote click handlers, image expand, etc can be added in separate scripts by listening to the event
+		setTimeout(() => {
+			window.dispatchEvent(newPostEvent);
+		}, 50);
 	};
 
 	//add text before post-info to show posts deleted, moved, etc

@@ -31,6 +31,7 @@ mixin postfile(post, file, manage=false, globalmanage=false, overboard=false)
 					if file.durationString
 						| , #{file.durationString}
 					| )
+				
 				if type === 'image'
 					if (board && board.settings.reverseImageSearchLinks === true) || (overboard && overboardReverseLinks === true) || manage || modview || globalmanage
 						br
@@ -43,6 +44,13 @@ mixin postfile(post, file, manage=false, globalmanage=false, overboard=false)
 				if file.mimetype === 'tegaki/replay'
 					|  
 					span.jsonly: a.dummy-link.replay-tegaki.noselect(href=`/file/${file.filename}` download=file.originalFilename) #{__('Replay')}
+				if file.altText
+					span.jsonly
+						|  
+						b [
+						a.dummy-link.alt-toggle.noselect(data-hash=file.hash) #{__('Alt')}
+						b ]
+					div.alt-text(id=`alt-text-${file.hash}`, hidden) #{` ${file.altText}`}
 		if !(manage || modview || globalmanage || file.approved)
 			+filependingapproval()
 		else

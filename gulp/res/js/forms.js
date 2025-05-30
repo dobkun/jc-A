@@ -567,6 +567,7 @@ class postFormHandler {
 		const item = {
 			spoilers: this.fileUploadList.dataset.spoilers === 'true',
 			stripFilenames: this.fileUploadList.dataset.stripFilenames === 'true',
+			altText: this.fileUploadList.dataset.altText === 'true',
 			name: file.name,
 			hash: fileHash,
 			...fileOptions,

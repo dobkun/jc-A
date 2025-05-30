@@ -14,3 +14,9 @@ mixin uploaditem(item)
 					label
 						input(type='checkbox', name='strip_filename', value=item.hash)
 						| #{__('Strip Filename')}
+			if item.altText	
+				.row.sb
+					label
+						input(type="text", name=`alt_text_${item.hash}`)
+						| #{__('Alt')}
+

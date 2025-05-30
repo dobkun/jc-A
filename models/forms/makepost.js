@@ -293,6 +293,12 @@ module.exports = async (req, res) => {
 				extension: file.extension,
 			};
 
+			const altTextKey = `alt_text_${file.sha256}`;
+			const altText = req.body[altTextKey]?.trim();
+			if (altText) {
+				processedFile.altText = altText;
+			}
+
 			//phash
 			if (file.phash) {
 				processedFile.phash = file.phash;
