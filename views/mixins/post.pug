@@ -147,7 +147,7 @@ mixin post(post, truncate, manage=false, globalmanage=false, ban=false, overboar
 					time.reltime(datetime=postEditDate.toISOString()) #{postEditDate.toLocaleString(pageLanguage, { hourCycle:'h23' })}
 					| #{lastEdited[1]}
 			if !post.op && post.selfmod
-				small.cb.mv-5.ml-5.edited #{'The OP of this thread enabled self moderation, see '}<a href='/faq.html#post-options'>FAQ</a>#{' for more detail.'}
+				small.edited #{'The OP of this thread enabled self moderation, see '}<a href='/faq.html#post-options'>FAQ</a>#{' for more detail.'}
 			if post.banmessage
 				+banmessage(post.banmessage)
 			if truncatedMessage !== post.message
