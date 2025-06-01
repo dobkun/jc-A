@@ -1,4 +1,6 @@
 /* globals __ __n modal Tegaki turnstile grecaptcha hcaptcha captchaController appendLocalStorageArray socket isThread setLocalStorage forceUpdate captchaController uploaditem */
+const captchaPromt = 'Request dropped, please complete the <a href="/managed-challenge.html" target="_blank" rel="noopener noreferrer">CAPTCHA</a>. If issue persists refresh the page or contact <a href="/faq.html#contact" target="_blank" rel="noopener noreferrer">ADMIN</a>.';
+
 async function videoThumbnail(file) {
 	return new Promise((resolve, reject) => {
 		const hiddenVideo = document.createElement('video');
@@ -472,7 +474,7 @@ class postFormHandler {
 					//something is completely wrong, usually no connection or server down
 					doModal({
 						'title': 'Error',
-						'message': 'Your request has been dropped, you may need to complete the <a href="/managed-challenge.html" target="_blank" rel="noopener noreferrer">captcha</a>. If issue persists see <a href="/faq.html" target="_blank" rel="noopener noreferrer">faq</a> to email site admin. <b>Note, posting from TOR is not supported.</b>'
+						'message': captchaPromt,
 					});
 				}
 
@@ -488,7 +490,7 @@ class postFormHandler {
 			console.error(err);
 			doModal({
 				'title': 'Error',
-				'message': 'Your request has been dropped, you may need to complete the <a href="/managed-challenge.html" target="_blank" rel="noopener noreferrer">captcha</a>. If issue persists see <a href="/faq.html" target="_blank" rel="noopener noreferrer">faq</a> to email site admin. <b>Note, posting from TOR is not supported.</b>'
+				'message': captchaPromt,
 			});
 			if (this.submit) {
 				this.submit.disabled = false;
