@@ -4,6 +4,12 @@ form.form-post(action=`/forms/appeal`, enctype='application/x-www-form-urlencode
 			+ban(ban, true)
 	- const allowAppeal = bans.filter(ban => ban.allowAppeal === true && !ban.appeal).length > 0;
 	if allowAppeal === true
+		p
+			| Please appeal your ban(s), rude or poorly written appeals will be rejected.
+		small.edited
+			| Note: If your IP is dynamic or your ISP uses a proxy-cache, you might
+			| be affected by a ban meant for somebody else. If you believe that to be 
+			| the case, state so in the appeal.
 		h4.no-m-p #{__('Appeal')}:
 			.form-wrapper.flexleft.mt-10
 				input(type='hidden' name='_csrf' value=csrf)
