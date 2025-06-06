@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 		});
 	}
 
-	let container = document.querySelector('.board-ad-container');
+	/* let container = document.querySelector('.board-ad-container');
 	let boardad = document.querySelector('.board-ad');
 	let link = boardad?.closest('a');
 
@@ -37,5 +37,5 @@ window.addEventListener('DOMContentLoaded', async () => {
 		} catch (err) {
 			console.error('Failed to load random board ad:', err);
 		}
-	}
+	} */
 });
